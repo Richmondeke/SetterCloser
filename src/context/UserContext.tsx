@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 type UserRole = "talent" | "company" | null;
+type ViewMode = "admin" | "hiring" | "setter" | "closer";
 
 interface TalentData {
   roleType: string | null;
@@ -51,6 +52,14 @@ interface UserContextType {
 
   // Onboarding state
   onboardingComplete: boolean;
+
+  // Demo mode
+  demoMode: boolean;
+  toggleDemoMode: () => void;
+
+  // View mode (role switcher)
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
 }
 
 const defaultTalentData: TalentData = {
@@ -88,6 +97,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [talentData, setTalentData] = useState<TalentData>(defaultTalentData);
   const [companyData, setCompanyData] = useState<CompanyData>(defaultCompanyData);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [demoMode, setDemoMode] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("setter");
+
+  const toggleDemoMode = () => setDemoMode((prev) => !prev);
 
   const userInitials = userName
     ? userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -98,6 +111,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserEmail(email);
     setUserRole(role);
     setIsAuthenticated(true);
+    // Set view mode based on sign-up role
+    if (role === "company") setViewMode("hiring");
+    else setViewMode("setter");
   };
 
   const signIn = (email: string, role: UserRole) => {
@@ -106,6 +122,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserName(role === "company" ? "ScaleUp.io" : "Jane Smith");
     setIsAuthenticated(true);
     setOnboardingComplete(true);
+    if (role === "company") setViewMode("hiring");
+    else setViewMode("setter");
   };
 
   const signOut = () => {
@@ -116,6 +134,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setTalentData(defaultTalentData);
     setCompanyData(defaultCompanyData);
     setOnboardingComplete(false);
+    setViewMode("setter");
   };
 
   const updateTalentData = (data: Partial<TalentData>) => {
@@ -136,6 +155,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
       talentData, companyData,
       signUp, signIn, signOut, updateTalentData, updateCompanyData, completeOnboarding,
       onboardingComplete,
+      demoMode, toggleDemoMode,
+      viewMode, setViewMode,
     }}>
       {children}
     </UserContext.Provider>

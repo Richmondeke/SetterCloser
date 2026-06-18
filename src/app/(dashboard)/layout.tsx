@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 
-/* ─── Nav structure ─── */
-const TALENT_NAV = [
+/* ─── Nav structures by view mode ─── */
+const SETTER_NAV = [
   {
     label: "MAIN",
     items: [
@@ -25,7 +25,26 @@ const TALENT_NAV = [
   },
 ];
 
-const COMPANY_NAV = [
+const CLOSER_NAV = [
+  {
+    label: "MAIN",
+    items: [
+      { name: "Dashboard", href: "/talent/dashboard", icon: "◎" },
+      { name: "Find Jobs", href: "/talent/jobs", icon: "◇" },
+      { name: "My Earnings", href: "/talent/earnings", icon: "$" },
+    ],
+  },
+  {
+    label: "ACCOUNT",
+    items: [
+      { name: "Profile", href: "/talent/profile", icon: "○" },
+      { name: "Settings", href: "/talent/settings", icon: "⚙" },
+      { name: "Sign Out", href: "/", icon: "→" },
+    ],
+  },
+];
+
+const HIRING_NAV = [
   {
     label: "MAIN",
     items: [
@@ -51,6 +70,68 @@ const COMPANY_NAV = [
   },
 ];
 
+const ADMIN_NAV = [
+  {
+    label: "OVERVIEW",
+    items: [
+      { name: "Admin Dashboard", href: "/company/dashboard", icon: "◎" },
+      { name: "All Talent", href: "/company/browse", icon: "◇" },
+      { name: "All Jobs", href: "/company/jobs", icon: "▤" },
+      { name: "Pipeline", href: "/company/pipeline", icon: "⊞" },
+    ],
+  },
+  {
+    label: "AI & AUTOMATION",
+    items: [
+      { name: "AI Agents", href: "/company/ai-agents", icon: "⚡" },
+      { name: "Autopilot", href: "/company/autopilot", icon: "↻" },
+    ],
+  },
+  {
+    label: "TALENT VIEW",
+    items: [
+      { name: "Talent Dashboard", href: "/talent/dashboard", icon: "◎" },
+      { name: "Job Board", href: "/talent/jobs", icon: "◇" },
+      { name: "Earnings", href: "/talent/earnings", icon: "$" },
+      { name: "Talent Profile", href: "/talent/profile", icon: "○" },
+    ],
+  },
+  {
+    label: "SYSTEM",
+    items: [
+      { name: "Settings", href: "/company/settings", icon: "⚙" },
+      { name: "Sign Out", href: "/", icon: "→" },
+    ],
+  },
+];
+
+/* ─── View Mode Config ─── */
+const VIEW_MODES = [
+  { key: "admin" as const, label: "Admin", color: "#f36458", icon: "⊕" },
+  { key: "hiring" as const, label: "Hiring", color: "#55beff", icon: "◎" },
+  { key: "setter" as const, label: "Setter", color: "#37cd84", icon: "◇" },
+  { key: "closer" as const, label: "Closer", color: "#e9c46a", icon: "⊞" },
+];
+
+function getNavForMode(mode: string) {
+  switch (mode) {
+    case "admin": return ADMIN_NAV;
+    case "hiring": return HIRING_NAV;
+    case "closer": return CLOSER_NAV;
+    default: return SETTER_NAV;
+  }
+}
+
+function getDashboardForMode(mode: string) {
+  switch (mode) {
+    case "admin":
+    case "hiring":
+      return "/company/dashboard";
+    default:
+      return "/talent/dashboard";
+  }
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -58,13 +139,20 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { userName, userInitials, userRole, companyData, signOut } = useUser();
+  const {
+    userName, userInitials, userRole, companyData, signOut,
+    demoMode, toggleDemoMode,
+    viewMode, setViewMode,
+  } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const isCompany = pathname.startsWith("/company");
-  const navSections = isCompany ? COMPANY_NAV : TALENT_NAV;
-
+  const navSections = getNavForMode(viewMode);
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+
+  const handleViewModeChange = (mode: typeof viewMode) => {
+    setViewMode(mode);
+    router.push(getDashboardForMode(mode));
+  };
 
   /* ─── Sidebar content (shared between desktop & mobile) ─── */
   const SidebarContent = () => (
@@ -77,15 +165,46 @@ export default function DashboardLayout({
         </span>
       </div>
 
+      {/* ── Role Switcher ── */}
+      <div className="px-3 pt-4 pb-2">
+        <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider px-3 mb-2 block">
+          View As
+        </span>
+        <div className="grid grid-cols-2 gap-1.5">
+          {VIEW_MODES.map((mode) => (
+            <button
+              key={mode.key}
+              onClick={() => handleViewModeChange(mode.key)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-[6px] text-[12px] cursor-pointer transition ${
+                viewMode === mode.key
+                  ? "bg-[#0b0b0b] border border-[#353535]"
+                  : "hover:bg-[#0b0b0b]/50 border border-transparent"
+              }`}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: viewMode === mode.key ? mode.color : "#353535" }}
+              />
+              <span
+                className="font-medium"
+                style={{ color: viewMode === mode.key ? mode.color : "#797979" }}
+              >
+                {mode.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
+      <nav className="flex-1 py-2 overflow-y-auto">
         {navSections.map((section) => (
-          <div key={section.label} className="mb-6">
+          <div key={section.label} className="mb-4">
             <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider px-6 mb-2 block">
               {section.label}
             </span>
 
-            {section.items.map((item) => (
+            {section.items.map((item) =>
               item.name === "Sign Out" ? (
                 <button
                   key={item.href}
@@ -118,10 +237,35 @@ export default function DashboardLayout({
                 {item.name}
               </Link>
               )
-            ))}
+            )}
           </div>
         ))}
       </nav>
+
+      {/* Demo Mode Toggle */}
+      <div className="mx-6 mb-4 p-3 bg-[#0b0b0b] rounded-[8px] border border-[#353535]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={`w-1.5 h-1.5 rounded-full ${demoMode ? 'bg-[#37cd84]' : 'bg-[#797979]'}`} />
+            <span className="text-[13px] text-[#b9b9b9]">Demo Mode</span>
+          </div>
+          <button
+            onClick={toggleDemoMode}
+            className={`relative w-9 h-5 rounded-full transition-colors cursor-pointer ${
+              demoMode ? 'bg-[#37cd84]' : 'bg-[#353535]'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                demoMode ? 'translate-x-4' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
+        <p className="text-[11px] text-[#797979] mt-1.5 font-mono">
+          {demoMode ? 'SHOWING MOCK DATA' : 'LIVE MODE — EMPTY STATES'}
+        </p>
+      </div>
 
       {/* User block */}
       <div className="p-6 border-t border-[#353535] flex items-center gap-3">
@@ -130,10 +274,14 @@ export default function DashboardLayout({
         </div>
         <div className="min-w-0">
           <p className="text-[#ffffff] text-[15px] truncate">
-            {isCompany ? (companyData.companyName || userName) : userName}
+            {viewMode === "hiring" || viewMode === "admin"
+              ? (companyData.companyName || userName || "Admin")
+              : userName || "Sales Rep"}
           </p>
-          <p className="font-mono text-[11px] text-[#797979] uppercase">
-            {userRole === "company" ? "Company" : "Sales Rep"}
+          <p className="font-mono text-[11px] uppercase" style={{
+            color: VIEW_MODES.find(m => m.key === viewMode)?.color || "#797979"
+          }}>
+            {VIEW_MODES.find(m => m.key === viewMode)?.label} Mode
           </p>
         </div>
       </div>
@@ -191,8 +339,17 @@ export default function DashboardLayout({
             </button>
           </div>
 
-          {/* Right — notification + avatar */}
+          {/* Right — mode badge + notification + avatar */}
           <div className="flex items-center gap-4">
+            <span
+              className="text-[11px] font-mono uppercase rounded-full px-2.5 py-0.5"
+              style={{
+                color: VIEW_MODES.find(m => m.key === viewMode)?.color,
+                backgroundColor: `${VIEW_MODES.find(m => m.key === viewMode)?.color}15`,
+              }}
+            >
+              {viewMode} mode
+            </span>
             <button
               className="text-[#b9b9b9] hover:text-[#ffffff] transition text-sm cursor-pointer"
               aria-label="Notifications"

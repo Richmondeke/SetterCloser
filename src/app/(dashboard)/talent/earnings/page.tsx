@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useUser } from "@/context/UserContext";
 
 /* ─── Types ─── */
 type EarningStatus = "Verified" | "Pending" | "Disputed" | "Auto-Verified";
@@ -23,8 +24,8 @@ interface Toast {
   visible: boolean;
 }
 
-/* ─── Seed data ─── */
-const INITIAL_EARNINGS: Earning[] = [
+/* ─── Demo data ─── */
+const DEMO_INITIAL_EARNINGS: Earning[] = [
   { id: "e1", type: "Meeting", company: "ScaleUp.io", amount: 150, status: "Auto-Verified", date: "Jun 18, 2026", method: "Calendar sync" },
   { id: "e2", type: "Deal", company: "RevOps Labs", amount: 2400, status: "Verified", date: "Jun 17, 2026", method: "CRM sync" },
   { id: "e3", type: "Meeting", company: "CloseFast", amount: 150, status: "Pending", date: "Jun 17, 2026", method: "Manual" },
@@ -35,6 +36,20 @@ const INITIAL_EARNINGS: Earning[] = [
   { id: "e8", type: "Meeting", company: "CloudOps", amount: 150, status: "Auto-Verified", date: "Jun 14, 2026", method: "Calendar sync" },
   { id: "e9", type: "Meeting", company: "PipelineCo", amount: 150, status: "Pending", date: "Jun 13, 2026", method: "Manual" },
   { id: "e10", type: "Deal", company: "AgencyX", amount: 1200, status: "Verified", date: "Jun 12, 2026", method: "Manual" },
+];
+
+const DEMO_STATS = [
+  { value: "$12,400", label: "Total Verified", accent: "text-[#37cd84]" },
+  { value: "47", label: "Meetings Booked", accent: "text-[#ffffff]" },
+  { value: "$264", label: "Avg Per Meeting", accent: "text-[#ffffff]" },
+  { value: "92%", label: "Verification Rate", accent: "text-[#ffffff]" },
+];
+
+const EMPTY_STATS = [
+  { value: "$0", label: "Total Verified", accent: "text-[#37cd84]" },
+  { value: "0", label: "Meetings Booked", accent: "text-[#ffffff]" },
+  { value: "$0", label: "Avg Per Meeting", accent: "text-[#ffffff]" },
+  { value: "0%", label: "Verification Rate", accent: "text-[#ffffff]" },
 ];
 
 const FILTER_TABS = ["All", "Verified", "Pending", "Disputed"] as const;
@@ -66,10 +81,12 @@ const typeBadgeLabel: Record<EarningType, string> = {
 
 /* ────────────────────────────────────────────── */
 export default function EarningsPage() {
+  const { demoMode } = useUser();
+
   const [calendarConnected, setCalendarConnected] = useState(false);
   const [showLogForm, setShowLogForm] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
-  const [earnings, setEarnings] = useState<Earning[]>(INITIAL_EARNINGS);
+  const [earnings, setEarnings] = useState<Earning[]>(demoMode ? DEMO_INITIAL_EARNINGS : []);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   /* ── form state ── */
@@ -79,6 +96,13 @@ export default function EarningsPage() {
   const [formDate, setFormDate] = useState("");
   const [formDesc, setFormDesc] = useState("");
   const [formEvidence, setFormEvidence] = useState("");
+
+  /* ── Sync earnings with demoMode changes ── */
+  useEffect(() => {
+    setEarnings(demoMode ? DEMO_INITIAL_EARNINGS : []);
+  }, [demoMode]);
+
+  const stats = demoMode ? DEMO_STATS : EMPTY_STATS;
 
   /* ── toast helper ── */
   const pushToast = useCallback((company: string) => {
@@ -98,7 +122,7 @@ export default function EarningsPage() {
 
   /* ── Real-time auto-detection simulation ── */
   useEffect(() => {
-    if (!calendarConnected) return;
+    if (!calendarConnected || !demoMode) return;
 
     const t1 = setTimeout(() => {
       const newEarning: Earning = {
@@ -132,7 +156,7 @@ export default function EarningsPage() {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [calendarConnected, pushToast]);
+  }, [calendarConnected, demoMode, pushToast]);
 
   /* ── Submit handler ── */
   const handleSubmit = () => {
@@ -175,14 +199,6 @@ export default function EarningsPage() {
             return e.status === "Verified" || e.status === "Auto-Verified";
           return e.status === activeFilter;
         });
-
-  /* ── Stats ── */
-  const stats = [
-    { value: "$12,400", label: "Total Verified", accent: "text-[#37cd84]" },
-    { value: "47", label: "Meetings Booked", accent: "text-[#ffffff]" },
-    { value: "$264", label: "Avg Per Meeting", accent: "text-[#ffffff]" },
-    { value: "92%", label: "Verification Rate", accent: "text-[#ffffff]" },
-  ];
 
   /* ── Verification steps ── */
   const steps = [
@@ -477,50 +493,59 @@ export default function EarningsPage() {
             )}
           </div>
 
-          {/* Rows */}
-          {filteredEarnings.length === 0 && (
+          {/* Rows or empty state */}
+          {earnings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <span className="text-[32px] mb-3 opacity-30">💰</span>
+              <p className="text-[#ffffff] text-[16px]">No earnings recorded yet</p>
+              <p className="text-[#797979] text-[14px] mt-1 max-w-xs">
+                Book meetings to start earning. Connect your calendar to auto-detect activity.
+              </p>
+            </div>
+          ) : filteredEarnings.length === 0 ? (
             <div className="px-6 py-8 text-center text-[#797979] text-[14px]">
               No earnings match this filter.
             </div>
+          ) : (
+            filteredEarnings.map((row, idx) => (
+              <div
+                key={row.id}
+                className={`px-6 py-4 grid grid-cols-6 items-center ${
+                  idx < filteredEarnings.length - 1
+                    ? "border-b border-[#353535]"
+                    : ""
+                }`}
+              >
+                {/* Type badge */}
+                <span>
+                  <span className="bg-[#0b0b0b] text-[#b9b9b9] text-[11px] font-mono rounded-full px-2 py-0.5">
+                    {typeBadgeLabel[row.type]}
+                  </span>
+                </span>
+                {/* Company */}
+                <span className="text-[#ffffff] text-[15px]">{row.company}</span>
+                {/* Amount */}
+                <span className="text-[#37cd84] text-[15px] font-medium">
+                  {fmtCurrency(row.amount)}
+                </span>
+                {/* Status */}
+                <span className="flex items-center gap-1.5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${statusDotColor[row.status]}`}
+                  />
+                  <span className={`${statusTextColor[row.status]} text-[13px]`}>
+                    {row.status === "Auto-Verified"
+                      ? "Auto-Verified ⚡"
+                      : row.status}
+                  </span>
+                </span>
+                {/* Method */}
+                <span className="text-[#797979] text-[13px]">{row.method}</span>
+                {/* Date */}
+                <span className="text-[#797979] text-[13px]">{row.date}</span>
+              </div>
+            ))
           )}
-          {filteredEarnings.map((row, idx) => (
-            <div
-              key={row.id}
-              className={`px-6 py-4 grid grid-cols-6 items-center ${
-                idx < filteredEarnings.length - 1
-                  ? "border-b border-[#353535]"
-                  : ""
-              }`}
-            >
-              {/* Type badge */}
-              <span>
-                <span className="bg-[#0b0b0b] text-[#b9b9b9] text-[11px] font-mono rounded-full px-2 py-0.5">
-                  {typeBadgeLabel[row.type]}
-                </span>
-              </span>
-              {/* Company */}
-              <span className="text-[#ffffff] text-[15px]">{row.company}</span>
-              {/* Amount */}
-              <span className="text-[#37cd84] text-[15px] font-medium">
-                {fmtCurrency(row.amount)}
-              </span>
-              {/* Status */}
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${statusDotColor[row.status]}`}
-                />
-                <span className={`${statusTextColor[row.status]} text-[13px]`}>
-                  {row.status === "Auto-Verified"
-                    ? "Auto-Verified ⚡"
-                    : row.status}
-                </span>
-              </span>
-              {/* Method */}
-              <span className="text-[#797979] text-[13px]">{row.method}</span>
-              {/* Date */}
-              <span className="text-[#797979] text-[13px]">{row.date}</span>
-            </div>
-          ))}
         </div>
       </div>
 
