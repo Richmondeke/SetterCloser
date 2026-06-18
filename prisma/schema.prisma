@@ -1,0 +1,354 @@
+// ─────────────────────────────────────────────────────────────
+// SetterCloser — Prisma Schema
+// Hiring platform for sales setters, closers & AI sales agents
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────── Enums ────────────────
+
+enum UserRole {
+  TALENT
+  COMPANY
+  ADMIN
+}
+
+enum TalentRoleType {
+  SETTER
+  CLOSER
+  BOTH
+}
+
+enum CompensationType {
+  COMMISSION_ONLY
+  BASE_PLUS_COMMISSION
+  PER_MEETING
+  SALARY
+}
+
+enum EarningType {
+  MEETING_BOOKED
+  FORM_FILLED
+  DEAL_CLOSED
+}
+
+enum VerificationStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  REJECTED
+}
+
+enum JobStatus {
+  ACTIVE
+  PAUSED
+  FILLED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENING
+  INTERVIEWING
+  OFFERED
+  HIRED
+  REJECTED
+  WITHDRAWN
+}
+
+enum AIAgentTemplate {
+  COLD_OUTBOUND
+  INBOUND_QUALIFIER
+  MEETING_BOOKER
+  FULL_CYCLE
+}
+
+enum AIAgentStatus {
+  SETUP
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  TERMINATED
+}
+
+// ──────────────── Models ────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?
+  name          String
+  avatarUrl     String?
+  role          UserRole
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  talentProfile  TalentProfile?
+  companyProfile CompanyProfile?
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  sentReviews      Review[]  @relation("SentReviews")
+  receivedReviews  Review[]  @relation("ReceivedReviews")
+}
+
+model TalentProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  roleType               TalentRoleType
+  headline               String?
+  bio                    String?        @db.Text
+  industries             String[]
+  salesFrameworks        String[]
+  compensationPreference CompensationType
+  timezone               String
+  availableFrom          DateTime?
+  isAvailable            Boolean @default(true)
+
+  // Aggregated stats (denormalized for fast reads)
+  trustScore         Float @default(0)
+  totalMeetingsBooked Int   @default(0)
+  totalDealsClosed   Int   @default(0)
+  totalEarnings      Float @default(0)
+
+  // Profile links
+  linkedinUrl   String?
+  portfolioUrl  String?
+  videoIntroUrl String?
+
+  yearsExperience Int?
+  isFeatured      Boolean @default(false)
+  isVerified      Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  verifiedEarnings VerifiedEarning[]
+  applications     Application[]
+  contracts        Contract[]
+
+  @@index([roleType])
+  @@index([industries])
+  @@index([isAvailable])
+  @@index([trustScore])
+  @@index([isFeatured, isAvailable])
+}
+
+model CompanyProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  companyName   String
+  industry      String
+  website       String?
+  logoUrl       String?
+  description   String? @db.Text
+  teamSize      Int?
+  icpDefinition Json?
+  location      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  jobPostings      JobPosting[]
+  aiAgents         AIAgent[]
+  verifiedEarnings VerifiedEarning[] // earnings this company has confirmed/disputed
+  contracts        Contract[]
+}
+
+model JobPosting {
+  id        String @id @default(cuid())
+  companyId String
+  company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  title               String
+  description         String         @db.Text
+  roleType            TalentRoleType
+  compensationType    CompensationType
+  compensationDetails Json?          // ranges, commission %, tiers, etc.
+  industries          String[]
+  requiredFrameworks  String[]
+  location            String?
+  isRemote            Boolean   @default(true)
+  status              JobStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  applications Application[]
+
+  @@index([status])
+  @@index([roleType])
+  @@index([companyId])
+  @@index([status, roleType])
+}
+
+model VerifiedEarning {
+  id        String @id @default(cuid())
+  talentId  String
+  companyId String
+  talent    TalentProfile  @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  type               EarningType
+  amount             Float
+  currency           String             @default("USD")
+  description        String?
+  evidence           Json?              // calendar links, CRM screenshots, etc.
+  verificationStatus VerificationStatus @default(PENDING)
+  verifiedAt         DateTime?
+  disputeReason      String?            @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([talentId])
+  @@index([companyId])
+  @@index([verificationStatus])
+  @@index([talentId, verificationStatus])
+}
+
+model AIAgent {
+  id        String @id @default(cuid())
+  companyId String
+  company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name             String
+  template         AIAgentTemplate
+  composioConfig   Json?   // connected tool configs from Composio
+  icpConfig        Json?   // target audience config
+  messagingConfig  Json?   // outreach templates, tone, sequences
+  operatingHours   Json?   // schedule windows
+
+  dailyOutreachLimit Int           @default(50)
+  isHumanInLoop      Boolean       @default(true)
+  status             AIAgentStatus @default(SETUP)
+
+  // Aggregated stats
+  totalMeetingsBooked  Int @default(0)
+  totalLeadsContacted  Int @default(0)
+  totalRepliesReceived Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  activities AIAgentActivity[]
+
+  @@index([companyId])
+  @@index([status])
+  @@index([companyId, status])
+}
+
+model AIAgentActivity {
+  id      String @id @default(cuid())
+  agentId String
+  agent   AIAgent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  type String // 'email_sent', 'reply_received', 'meeting_booked', 'lead_qualified'
+  data Json   // full activity payload
+
+  createdAt DateTime @default(now())
+
+  @@index([agentId])
+  @@index([agentId, type])
+  @@index([createdAt])
+}
+
+model Application {
+  id       String @id @default(cuid())
+  talentId String
+  jobId    String
+  talent   TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  job      JobPosting    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  status    ApplicationStatus @default(APPLIED)
+  coverNote String?           @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([talentId, jobId])
+  @@index([talentId])
+  @@index([jobId])
+  @@index([status])
+  @@index([talentId, status])
+}
+
+model Review {
+  id         String @id @default(cuid())
+  reviewerId String
+  revieweeId String
+  reviewer   User @relation("SentReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee   User @relation("ReceivedReviews", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  rating  Int     // 1–5
+  comment String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([reviewerId])
+  @@index([revieweeId])
+  @@index([revieweeId, rating])
+}
+
+model Message {
+  id         String @id @default(cuid())
+  senderId   String
+  receiverId String
+  sender     User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  content String  @db.Text
+  isRead  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([isRead])
+  @@index([receiverId, isRead])
+  @@index([senderId, receiverId])
+}
+
+model Contract {
+  id        String @id @default(cuid())
+  talentId  String
+  companyId String
+  talent    TalentProfile  @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  company   CompanyProfile @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  title                String
+  terms                Json           // compensation structure, duration, deliverables
+  status               ContractStatus @default(DRAFT)
+  startDate            DateTime?
+  endDate              DateTime?
+  stripePaymentIntentId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([talentId])
+  @@index([companyId])
+  @@index([status])
+  @@index([talentId, status])
+}
