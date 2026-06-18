@@ -1,5 +1,7 @@
 "use client";
 
+import { FadeIn, FadeInLeft, FadeInRight } from "@/components/motion";
+
 const humanFeatures = [
   "Pre-vetted setters & closers",
   "Verified performance history",
@@ -20,19 +22,20 @@ export default function DualPath() {
   return (
     <section className="bg-[#0b0b0b] py-[96px] px-6">
       <div className="max-w-5xl mx-auto">
-        {/* Eyebrow */}
-        <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
-          Choose Your Path
-        </p>
-
-        {/* Headline */}
-        <h2 className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal text-center max-w-3xl mx-auto mt-4">
-          Human reps or AI agents — your call
-        </h2>
+        {/* Eyebrow + Headline */}
+        <FadeIn>
+          <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
+            Choose Your Path
+          </p>
+          <h2 className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal text-center max-w-3xl mx-auto mt-4">
+            Human reps or AI agents — your call
+          </h2>
+        </FadeIn>
 
         {/* Cards */}
         <div className="grid md:grid-cols-2 gap-6 mt-16">
           {/* Left Card — Hire Human Reps */}
+          <FadeInLeft delay={0.1}>
           <div className="bg-[#212121] rounded-[12px] p-8 border border-[#353535] hover:-translate-y-[2px] transition-transform duration-200">
             <h3 className="text-[#ffffff] text-[24px] tracking-[-0.24px] font-normal">
               Hire Human Reps
@@ -60,8 +63,10 @@ export default function DualPath() {
               </a>
             </div>
           </div>
+          </FadeInLeft>
 
           {/* Right Card — Deploy AI Sales Agents */}
+          <FadeInRight delay={0.2}>
           <div className="bg-[#212121] rounded-[12px] p-8 border border-[#353535] hover:-translate-y-[2px] transition-transform duration-200">
             {/* Coral dot accent */}
             <div className="w-2 h-2 rounded-full bg-[#f36458] mb-4" />
@@ -92,6 +97,7 @@ export default function DualPath() {
               </a>
             </div>
           </div>
+          </FadeInRight>
         </div>
       </div>
     </section>

@@ -1,5 +1,7 @@
 "use client";
 
+import { FadeIn } from "@/components/motion";
+
 const productLinks = [
   "Browse Talent",
   "AI Agents",
@@ -19,6 +21,7 @@ const socialLinks = ["Twitter", "LinkedIn", "GitHub", "Discord"];
 export default function Footer() {
   return (
     <footer className="bg-[#0b0b0b] py-[64px] px-6 border-t border-[#353535]">
+      <FadeIn>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-6 gap-12">
           {/* Brand lockup — spans 2 columns */}
@@ -117,6 +120,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      </FadeIn>
     </footer>
   );
 }

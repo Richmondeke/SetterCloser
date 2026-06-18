@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FadeIn } from "@/components/motion";
 
 const faqs = [
   {
@@ -45,20 +46,21 @@ export default function FAQ() {
   return (
     <section id="faq" className="bg-[#0b0b0b] py-[96px] px-6">
       <div className="max-w-3xl mx-auto">
-        {/* Eyebrow */}
-        <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
-          FAQ
-        </p>
-
-        {/* Headline */}
-        <h2 className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
-          Questions &amp; answers
-        </h2>
+        {/* Eyebrow + Headline */}
+        <FadeIn>
+          <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
+            FAQ
+          </p>
+          <h2 className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
+            Questions &amp; answers
+          </h2>
+        </FadeIn>
 
         {/* Accordion */}
         <div className="mt-16">
           {faqs.map((faq, index) => (
-            <div key={index} className="border-b border-[#353535]">
+            <FadeIn key={index} delay={index * 0.05}>
+            <div className="border-b border-[#353535]">
               <button
                 onClick={() => toggle(index)}
                 className="flex justify-between items-center py-6 w-full text-left group"
@@ -86,6 +88,7 @@ export default function FAQ() {
                 </p>
               </div>
             </div>
+            </FadeIn>
           ))}
         </div>
       </div>

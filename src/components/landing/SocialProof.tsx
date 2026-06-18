@@ -1,5 +1,7 @@
 "use client";
 
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/motion";
+
 const testimonials = [
   {
     quote:
@@ -28,41 +30,42 @@ export default function SocialProof() {
   return (
     <section className="bg-[#ededed] py-[96px] px-6">
       <div className="max-w-5xl mx-auto">
-        {/* Eyebrow */}
-        <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
-          Trusted By Sales Leaders
-        </p>
-
-        {/* Headline */}
-        <h2 className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
-          Results that speak for themselves
-        </h2>
+        {/* Eyebrow + Headline */}
+        <FadeIn>
+          <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
+            Trusted By Sales Leaders
+          </p>
+          <h2 className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
+            Results that speak for themselves
+          </h2>
+        </FadeIn>
 
         {/* Testimonial Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mt-16">
+        <StaggerContainer staggerDelay={0.15} className="grid md:grid-cols-3 gap-6 mt-16">
           {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="bg-[#ffffff] rounded-[12px] p-8 border border-[#ededed]"
-            >
-              <p className="text-[#0b0b0b] text-[16px] italic leading-relaxed">
-                &ldquo;{t.quote}&rdquo;
-              </p>
+            <StaggerItem key={t.name}>
+              <div
+                className="bg-[#ffffff] rounded-[12px] p-8 border border-[#ededed]"
+              >
+                <p className="text-[#0b0b0b] text-[16px] italic leading-relaxed">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
 
-              <div className="mt-6 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0b0b0b] flex items-center justify-center text-white text-sm font-medium shrink-0">
-                  {t.initials}
-                </div>
-                <div>
-                  <p className="text-[#0b0b0b] text-[15px] font-medium">
-                    {t.name}
-                  </p>
-                  <p className="text-[#797979] text-[13px]">{t.role}</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#0b0b0b] flex items-center justify-center text-white text-sm font-medium shrink-0">
+                    {t.initials}
+                  </div>
+                  <div>
+                    <p className="text-[#0b0b0b] text-[15px] font-medium">
+                      {t.name}
+                    </p>
+                    <p className="text-[#797979] text-[13px]">{t.role}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
