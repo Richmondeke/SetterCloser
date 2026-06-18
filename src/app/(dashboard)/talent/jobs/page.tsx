@@ -15,6 +15,7 @@ interface Job {
   role: RoleType;
   industry: Industry;
   comp: string;
+  dealSize: string;
   compType: CompType;
   remote: boolean;
   tags: string[];
@@ -29,7 +30,8 @@ const JOBS: Job[] = [
     desc: "Close high-ticket SaaS deals for a fast-growing revenue operations platform. Ideal for experienced closers who thrive in consultative sales environments.",
     role: "Closer",
     industry: "SaaS",
-    comp: "$5K-$15K/mo",
+    comp: "10-15% commission",
+    dealSize: "$5K-$50K deals",
     compType: "Commission",
     remote: true,
     tags: ["SaaS", "Closer", "Commission", "Remote"],
@@ -42,6 +44,7 @@ const JOBS: Job[] = [
     role: "Setter",
     industry: "Coaching",
     comp: "$150/meeting",
+    dealSize: "$3K-$10K programs",
     compType: "Per Meeting",
     remote: true,
     tags: ["Coaching", "Setter", "Remote", "Per Meeting"],
@@ -53,10 +56,11 @@ const JOBS: Job[] = [
     desc: "Run demos and close mid-market to enterprise deals for an AI-powered data integration platform. MEDDIC experience preferred.",
     role: "Closer",
     industry: "SaaS",
-    comp: "$8K-$20K/mo",
+    comp: "8-12% commission",
+    dealSize: "$20K-$150K deals",
     compType: "Commission",
     remote: false,
-    tags: ["SaaS", "Closer", "Commission"],
+    tags: ["SaaS", "Closer", "Commission", "Enterprise"],
   },
   {
     title: "Agency Sales Setter",
@@ -66,6 +70,7 @@ const JOBS: Job[] = [
     role: "Setter",
     industry: "Agency",
     comp: "$100/meeting",
+    dealSize: "$2K-$8K retainers",
     compType: "Per Meeting",
     remote: true,
     tags: ["Agency", "Setter", "Remote", "Per Meeting"],
@@ -77,7 +82,8 @@ const JOBS: Job[] = [
     desc: "Close $5K-$25K financial education programs. Must have experience in high-ticket phone sales and a proven track record.",
     role: "Closer",
     industry: "Coaching",
-    comp: "$10K-$30K/mo",
+    comp: "15-20% commission",
+    dealSize: "$5K-$25K programs",
     compType: "Commission",
     remote: false,
     tags: ["Coaching", "Closer", "Commission", "High-Ticket"],
@@ -89,7 +95,8 @@ const JOBS: Job[] = [
     desc: "Handle end-to-end sales from prospecting to close for a B2B SaaS tool. Great opportunity for versatile reps who can do both setting and closing.",
     role: "Both",
     industry: "SaaS",
-    comp: "$6K-$12K/mo",
+    comp: "$3K base + 8% commission",
+    dealSize: "$10K-$40K deals",
     compType: "Base + Commission",
     remote: true,
     tags: ["SaaS", "Both", "Remote", "Base + Commission"],
@@ -102,6 +109,7 @@ const JOBS: Job[] = [
     role: "Setter",
     industry: "FinTech",
     comp: "$200/meeting",
+    dealSize: "$15K-$80K deals",
     compType: "Per Meeting",
     remote: true,
     tags: ["FinTech", "Setter", "Remote", "Per Meeting"],
@@ -113,7 +121,8 @@ const JOBS: Job[] = [
     desc: "Close deals with medical practices and hospital networks for a patient management SaaS. Compliance and HIPAA familiarity helpful.",
     role: "Closer",
     industry: "Healthcare",
-    comp: "$7K-$18K/mo",
+    comp: "$4K base + 10% commission",
+    dealSize: "$8K-$60K deals",
     compType: "Base + Commission",
     remote: false,
     tags: ["Healthcare", "Closer", "Base + Commission"],
@@ -123,7 +132,7 @@ const JOBS: Job[] = [
 /* ── Filter Config ── */
 const ROLE_FILTERS: RoleType[] = ["Setter", "Closer", "Both"];
 const INDUSTRY_FILTERS: Industry[] = ["SaaS", "Coaching", "Agency", "FinTech", "E-Commerce", "Healthcare"];
-const COMP_FILTERS: CompType[] = ["Commission", "Per Meeting", "Base + Commission", "Salary"];
+const COMP_FILTERS: CompType[] = ["Commission", "Per Meeting", "Base + Commission"];
 
 export default function JobsPage() {
   const [search, setSearch] = useState("");
@@ -343,9 +352,14 @@ export default function JobsPage() {
                   </span>
                 )}
               </div>
-              <span className="text-[#37cd84] text-[15px] font-medium shrink-0 ml-4">
-                {job.comp}
-              </span>
+              <div className="text-right shrink-0 ml-4">
+                <span className="text-[#37cd84] text-[15px] font-medium block">
+                  {job.comp}
+                </span>
+                <span className="text-[#797979] text-[12px] block mt-0.5">
+                  {job.dealSize}
+                </span>
+              </div>
             </div>
           </div>
         ))}
