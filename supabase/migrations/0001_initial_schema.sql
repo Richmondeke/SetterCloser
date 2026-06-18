@@ -24,7 +24,7 @@ CREATE TYPE contract_status AS ENUM ('DRAFT', 'ACTIVE', 'COMPLETED', 'TERMINATED
 
 -- 1. Users
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT,
   name TEXT NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE users (
 
 -- 2. Talent Profiles
 CREATE TABLE talent_profiles (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
 
   role_type talent_role_type NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE talent_profiles (
 
 -- 3. Company Profiles
 CREATE TABLE company_profiles (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
 
   company_name TEXT NOT NULL,
@@ -89,7 +89,7 @@ CREATE TABLE company_profiles (
 
 -- 4. Job Postings
 CREATE TABLE job_postings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES company_profiles(id) ON DELETE CASCADE,
 
   title TEXT NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE job_postings (
 
 -- 5. Verified Earnings
 CREATE TABLE verified_earnings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   talent_id UUID NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
   company_id UUID NOT NULL REFERENCES company_profiles(id) ON DELETE CASCADE,
 
@@ -128,7 +128,7 @@ CREATE TABLE verified_earnings (
 
 -- 6. AI Agents
 CREATE TABLE ai_agents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES company_profiles(id) ON DELETE CASCADE,
 
   name TEXT NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE ai_agents (
 
 -- 7. AI Agent Activities
 CREATE TABLE ai_agent_activities (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID NOT NULL REFERENCES ai_agents(id) ON DELETE CASCADE,
 
   type TEXT NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE ai_agent_activities (
 
 -- 8. Applications
 CREATE TABLE applications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   talent_id UUID NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
   job_id UUID NOT NULL REFERENCES job_postings(id) ON DELETE CASCADE,
 
@@ -179,7 +179,7 @@ CREATE TABLE applications (
 
 -- 9. Reviews
 CREATE TABLE reviews (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reviewer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   reviewee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
@@ -191,7 +191,7 @@ CREATE TABLE reviews (
 
 -- 10. Messages
 CREATE TABLE messages (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 
@@ -203,7 +203,7 @@ CREATE TABLE messages (
 
 -- 11. Contracts
 CREATE TABLE contracts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   talent_id UUID NOT NULL REFERENCES talent_profiles(id) ON DELETE CASCADE,
   company_id UUID NOT NULL REFERENCES company_profiles(id) ON DELETE CASCADE,
 
@@ -220,7 +220,7 @@ CREATE TABLE contracts (
 
 -- 12. Autopilot Configs (NEW — for the autopilot feature)
 CREATE TABLE autopilot_configs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES company_profiles(id) ON DELETE CASCADE,
   role_type talent_role_type NOT NULL,
   industries TEXT[] DEFAULT '{}',
