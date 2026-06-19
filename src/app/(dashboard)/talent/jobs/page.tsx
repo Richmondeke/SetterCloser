@@ -145,6 +145,7 @@ export default function JobsPage() {
   const [industryFilter, setIndustryFilter] = useState<Industry | null>(null);
   const [compFilter, setCompFilter] = useState<CompType | null>(null);
   const [remoteOnly, setRemoteOnly] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<{ job: Job; index: number } | null>(null);
 
   const filtered = useMemo(() => {
     return JOBS.filter((job) => {
@@ -314,6 +315,7 @@ export default function JobsPage() {
           filtered.map((job, i) => (
             <div
               key={i}
+              onClick={() => setSelectedJob({ job, index: i })}
               className="bg-[#212121] rounded-[12px] p-6 border border-[#353535] hover:border-[#797979] transition cursor-pointer group"
             >
               <div className="flex justify-between items-start">
@@ -409,6 +411,134 @@ export default function JobsPage() {
           </div>
         )}
       </div>
+
+      {/* ── Slide-Out Detail Panel ── */}
+      {selectedJob && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+            onClick={() => setSelectedJob(null)}
+          />
+
+          {/* Panel */}
+          <div className="fixed right-0 top-0 h-full w-full max-w-[520px] bg-[#212121] border-l border-[#353535] z-50 flex flex-col overflow-hidden animate-slide-in-right">
+            {/* Header */}
+            <div className="sticky top-0 bg-[#212121] border-b border-[#353535] px-6 py-4 flex items-center justify-between z-10">
+              <span
+                className={`text-[11px] font-mono uppercase rounded-full px-2.5 py-0.5 ${
+                  selectedJob.job.role === "Setter"
+                    ? "bg-[#55beff]/10 text-[#55beff]"
+                    : selectedJob.job.role === "Closer"
+                    ? "bg-[#f36458]/10 text-[#f36458]"
+                    : "bg-[#37cd84]/10 text-[#37cd84]"
+                }`}
+              >
+                {selectedJob.job.role}
+              </span>
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="text-[#797979] hover:text-[#ffffff] transition text-[20px] cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#353535]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+              {/* Title & Company */}
+              <div>
+                <h2 className="text-[#ffffff] text-[24px] tracking-[-0.5px] font-normal">
+                  {selectedJob.job.title}
+                </h2>
+                <p className="text-[#b9b9b9] text-[15px] mt-1">{selectedJob.job.company}</p>
+                <p className="text-[#797979] text-[13px] mt-1">Posted {selectedJob.job.posted}</p>
+              </div>
+
+              {/* Quick Info Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-[#0b0b0b] rounded-[8px] p-4 border border-[#353535]">
+                  <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block">Compensation</span>
+                  <span className="text-[#37cd84] text-[15px] font-medium mt-1 block">{selectedJob.job.comp}</span>
+                </div>
+                <div className="bg-[#0b0b0b] rounded-[8px] p-4 border border-[#353535]">
+                  <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block">Deal Size</span>
+                  <span className="text-[#ffffff] text-[15px] mt-1 block">{selectedJob.job.dealSize}</span>
+                </div>
+                <div className="bg-[#0b0b0b] rounded-[8px] p-4 border border-[#353535]">
+                  <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block">Industry</span>
+                  <span className="text-[#ffffff] text-[15px] mt-1 block">{selectedJob.job.industry}</span>
+                </div>
+                <div className="bg-[#0b0b0b] rounded-[8px] p-4 border border-[#353535]">
+                  <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block">Location</span>
+                  <span className="text-[#ffffff] text-[15px] mt-1 flex items-center gap-1.5">
+                    {selectedJob.job.remote && <span className="w-1.5 h-1.5 rounded-full bg-[#37cd84]" />}
+                    {selectedJob.job.remote ? "Remote" : "On-site"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block mb-2">Tags</span>
+                <div className="flex gap-2 flex-wrap">
+                  {selectedJob.job.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="bg-[#0b0b0b] text-[#b9b9b9] text-[12px] rounded-full px-3 py-1 border border-[#353535]"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                  {selectedJob.job.remote && (
+                    <span className="bg-[#37cd84]/10 text-[#37cd84] text-[12px] rounded-full px-3 py-1 flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-[#37cd84]" />
+                      Remote
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Full Description */}
+              <div>
+                <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block mb-2">Description</span>
+                <p className="text-[#b9b9b9] text-[15px] leading-relaxed">
+                  {selectedJob.job.desc}
+                </p>
+              </div>
+
+              {/* About the Company */}
+              <div>
+                <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider block mb-2">About {selectedJob.job.company}</span>
+                <p className="text-[#b9b9b9] text-[15px] leading-relaxed">
+                  {selectedJob.job.company} is an innovative company in the {selectedJob.job.industry.toLowerCase()} space,
+                  focused on delivering transformative solutions to their clients. They offer competitive compensation structures
+                  and a {selectedJob.job.remote ? "fully remote" : "collaborative in-office"} work environment, making them an
+                  attractive opportunity for ambitious sales professionals looking to grow their careers.
+                </p>
+              </div>
+            </div>
+
+            {/* Actions — sticky bottom */}
+            <div className="border-t border-[#353535] px-6 py-4 bg-[#212121]">
+              {appliedJobs.has(selectedJob.index) ? (
+                <span className="bg-[#37cd84]/10 text-[#37cd84] border border-[#37cd84]/20 text-[14px] rounded-full px-6 py-2.5 inline-flex items-center gap-2">
+                  Applied ✓
+                </span>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAppliedJobs((prev) => new Set(prev).add(selectedJob.index));
+                  }}
+                  className="bg-[#f36458] text-[#ffffff] text-[14px] rounded-full px-6 py-2.5 hover:opacity-90 transition cursor-pointer"
+                >
+                  Apply Now
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

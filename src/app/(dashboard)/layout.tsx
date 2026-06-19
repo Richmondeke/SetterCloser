@@ -145,7 +145,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const {
     userName, userInitials, userRole, companyData, signOut,
-    demoMode, toggleDemoMode,
+    demoMode, toggleDemoMode, theme, toggleTheme,
     viewMode, setViewMode,
     hydrated, isAuthenticated, onboardingComplete,
   } = useUser();
@@ -333,7 +333,7 @@ export default function DashboardLayout({
       </nav>
 
       {/* Demo Mode Toggle */}
-      <div className="mx-6 mb-4 p-3 bg-[#0b0b0b] rounded-[8px] border border-[#353535]">
+      <div className="mx-6 mb-2 p-3 bg-[#0b0b0b] rounded-[8px] border border-[#353535]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-1.5 h-1.5 rounded-full ${demoMode ? 'bg-[#37cd84]' : 'bg-[#797979]'}`} />
@@ -355,6 +355,28 @@ export default function DashboardLayout({
         <p className="text-[11px] text-[#797979] mt-1.5 font-mono">
           {demoMode ? 'SHOWING MOCK DATA' : 'LIVE MODE — EMPTY STATES'}
         </p>
+      </div>
+
+      {/* Theme Toggle */}
+      <div className="mx-6 mb-4 p-3 bg-[#0b0b0b] rounded-[8px] border border-[#353535]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[14px]">{theme === 'dark' ? '🌙' : '☀️'}</span>
+            <span className="text-[13px] text-[#b9b9b9]">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+          </div>
+          <button
+            onClick={toggleTheme}
+            className={`relative w-9 h-5 rounded-full transition-colors cursor-pointer ${
+              theme === 'light' ? 'bg-[#55beff]' : 'bg-[#353535]'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                theme === 'light' ? 'translate-x-4' : 'translate-x-0.5'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* User block */}

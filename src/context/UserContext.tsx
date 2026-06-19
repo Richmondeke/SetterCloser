@@ -63,6 +63,10 @@ interface UserContextType {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
 
+  // Theme
+  theme: 'dark' | 'light';
+  toggleTheme: () => void;
+
   // Hydration
   hydrated: boolean;
 }
@@ -117,6 +121,7 @@ interface PersistedState {
   onboardingComplete: boolean;
   demoMode: boolean;
   viewMode: ViewMode;
+  theme: 'dark' | 'light';
 }
 
 function loadState(): PersistedState | null {
@@ -159,6 +164,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [demoMode, setDemoMode] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("setter");
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // ── Hydrate from localStorage on mount ──
   useEffect(() => {
@@ -173,6 +179,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
       setOnboardingComplete(saved.onboardingComplete);
       setDemoMode(saved.demoMode);
       setViewMode(saved.viewMode);
+      if (saved.theme) {
+        setTheme(saved.theme);
+        if (saved.theme === 'light') {
+          document.documentElement.classList.add('light');
+        }
+      }
     }
     setHydrated(true);
   }, []);
@@ -190,10 +202,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
       onboardingComplete,
       demoMode,
       viewMode,
+      theme,
     });
-  }, [hydrated, isAuthenticated, userRole, userName, userEmail, talentData, companyData, onboardingComplete, demoMode, viewMode]);
+  }, [hydrated, isAuthenticated, userRole, userName, userEmail, talentData, companyData, onboardingComplete, demoMode, viewMode, theme]);
 
   const toggleDemoMode = () => setDemoMode((prev) => !prev);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      if (next === 'light') {
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.classList.remove('light');
+      }
+      return next;
+    });
+  };
 
   const userInitials = userName
     ? userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -264,6 +289,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       onboardingComplete,
       demoMode, toggleDemoMode,
       viewMode, setViewMode,
+      theme, toggleTheme,
       hydrated,
     }}>
       {children}
