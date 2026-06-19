@@ -7,8 +7,22 @@ import { useUser } from "@/context/UserContext";
 /* ─── Step Definitions ─── */
 const STEPS = ["Your Role", "Expertise", "Compensation", "Profile", "Review"] as const;
 
-const INDUSTRIES = ["SaaS", "Coaching", "E-Commerce", "Agency", "FinTech", "Healthcare", "Real Estate", "Other"];
-const FRAMEWORKS = ["SPIN", "NEPQ", "Sandler", "Challenger", "MEDDIC", "Consultative", "BANT", "Other"];
+const INDUSTRIES = [
+  'SaaS', 'FinTech', 'AI / ML', 'Cybersecurity', 'Cloud / DevOps', 'MarTech', 'EdTech', 'HealthTech',
+  'Agency', 'Consulting', 'Coaching', 'Recruiting / Staffing', 'Legal', 'Accounting',
+  'E-Commerce', 'Retail', 'Wholesale / Distribution', 'Marketplace',
+  'Insurance', 'Financial Services', 'Wealth Management', 'Lending / Mortgage',
+  'Healthcare', 'Pharma / Biotech', 'Wellness / Fitness', 'Mental Health',
+  'Real Estate', 'PropTech', 'Construction',
+  'Media / Entertainment', 'Advertising', 'Events', 'Gaming',
+  'Energy / Utilities', 'Solar / Renewables', 'CleanTech',
+  'Manufacturing', 'Logistics / Supply Chain', 'Automotive',
+  'Nonprofit', 'Government / Public Sector', 'Education',
+  'Telecom', 'Hardware / IoT',
+  'Crypto / Web3', 'Food & Beverage', 'Travel / Hospitality', 'Sports', 'Agriculture',
+  'Other',
+];
+const FRAMEWORKS = ["SPIN", "NEPQ", "Sandler", "Challenger", "MEDDIC", "Consultative", "BANT", "Gap Selling", "Solution Selling", "Value Selling", "Other"];
 const COMP_OPTIONS = [
   { id: "commission", label: "Commission Only", desc: "100% performance-based pay" },
   { id: "base_commission", label: "Base + Commission", desc: "Stable base with upside potential" },
@@ -199,7 +213,7 @@ export default function OnboardingPage() {
           <Card>
             <h2 className="text-[#ffffff] text-[32px] tracking-[-0.32px] font-normal">What industries do you know?</h2>
             <p className="text-[#797979] mt-2">Select all that apply</p>
-            <div className="flex flex-wrap gap-2 mt-6">
+            <div className="flex flex-wrap gap-2 mt-6 max-h-[240px] overflow-y-auto pr-1">
               {INDUSTRIES.map((ind) => (
                 <button
                   key={ind}

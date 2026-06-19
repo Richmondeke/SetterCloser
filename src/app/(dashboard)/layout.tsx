@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 
@@ -215,7 +216,7 @@ export default function DashboardLayout({
     <div className="flex flex-col h-full">
       {/* Wordmark */}
       <div className="p-6 border-b border-[#353535] flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-[#f36458]" />
+        <Image src="/favicon.png" alt="SetterCloser" width={24} height={24} />
         <span className="text-[15px] font-medium text-[#ffffff] tracking-[-0.2px]">
           SetterCloser
         </span>

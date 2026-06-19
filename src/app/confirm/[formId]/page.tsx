@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 export default function ConfirmFormPage() {
   const params = useParams();
@@ -76,7 +77,7 @@ export default function ConfirmFormPage() {
       <div className="max-w-lg w-full">
         {/* Branding */}
         <div className="flex items-center gap-2 justify-center mb-8">
-          <span className="w-2 h-2 rounded-full bg-[#f36458]" />
+          <Image src="/favicon.png" alt="SetterCloser" width={24} height={24} />
           <span className="text-[15px] font-medium text-[#ffffff] tracking-[-0.2px]">
             SetterCloser
           </span>

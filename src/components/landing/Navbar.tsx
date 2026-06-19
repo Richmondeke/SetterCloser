@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
@@ -30,10 +31,9 @@ export default function Navbar() {
         <div className="flex h-[64px] items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#f36458]" />
-            <span className="text-[#ffffff] font-normal text-lg tracking-tight">
-              SetterCloser
-            </span>
+            <div className="bg-white rounded-[6px] px-2 py-1">
+              <Image src="/logo.jpg" alt="SetterCloser" width={140} height={28} className="h-6 w-auto" />
+            </div>
           </Link>
 
           {/* Desktop Links */}

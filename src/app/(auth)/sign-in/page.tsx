@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 
 type Role = "talent" | "company" | null;
@@ -42,7 +43,7 @@ export default function SignInPage() {
     <div className="bg-[#212121] rounded-[12px] p-8 border border-[#353535]">
       {/* Logo */}
       <div className="flex items-center justify-center gap-2 mb-8">
-        <span className="w-2 h-2 rounded-full bg-[#f36458]" />
+        <Image src="/favicon.png" alt="SetterCloser" width={24} height={24} />
         <span className="text-[15px] font-medium text-[#ffffff] tracking-[-0.2px]">
           SetterCloser
         </span>

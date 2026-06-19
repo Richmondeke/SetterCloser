@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn } from "@/components/motion";
+import Image from "next/image";
 
 const productLinks = [
   "Browse Talent",
@@ -26,9 +27,9 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-12">
           {/* Brand lockup — spans 2 columns */}
           <div className="md:col-span-2">
-            <div className="flex items-center">
-              <span className="w-3 h-3 rounded-full bg-[#f36458] inline-block" />
-              <span className="text-[#ffffff] text-lg font-normal tracking-tight ml-2">
+            <div className="flex items-center gap-2">
+              <Image src="/favicon.png" alt="SetterCloser" width={20} height={20} />
+              <span className="text-[#ffffff] text-lg font-normal tracking-tight">
                 SetterCloser
               </span>
             </div>
