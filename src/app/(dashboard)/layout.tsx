@@ -5,24 +5,40 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  DollarSign,
+  User,
+  Settings,
+  LogOut,
+  Users,
+  ClipboardList,
+  Cpu,
+  RefreshCw,
+  Bell,
+  Menu,
+  ChevronDown
+} from "lucide-react";
 
 /* ─── Nav structures by view mode ─── */
 const SETTER_NAV = [
   {
     label: "MAIN",
     items: [
-      { name: "Dashboard", href: "/talent/dashboard", icon: "◎" },
-      { name: "Find Jobs", href: "/talent/jobs", icon: "◇" },
-      { name: "My Forms", href: "/talent/forms", icon: "▢" },
-      { name: "My Earnings", href: "/talent/earnings", icon: "$" },
+      { name: "Dashboard", href: "/talent/dashboard", icon: LayoutDashboard },
+      { name: "Find Jobs", href: "/talent/jobs", icon: Briefcase },
+      { name: "My Forms", href: "/talent/forms", icon: FileText },
+      { name: "My Earnings", href: "/talent/earnings", icon: DollarSign },
     ],
   },
   {
     label: "ACCOUNT",
     items: [
-      { name: "Profile", href: "/talent/profile", icon: "○" },
-      { name: "Settings", href: "/talent/settings", icon: "⚙" },
-      { name: "Sign Out", href: "/", icon: "→" },
+      { name: "Profile", href: "/talent/profile", icon: User },
+      { name: "Settings", href: "/talent/settings", icon: Settings },
+      { name: "Sign Out", href: "/", icon: LogOut },
     ],
   },
 ];
@@ -31,18 +47,18 @@ const CLOSER_NAV = [
   {
     label: "MAIN",
     items: [
-      { name: "Dashboard", href: "/talent/dashboard", icon: "◎" },
-      { name: "Find Jobs", href: "/talent/jobs", icon: "◇" },
-      { name: "My Forms", href: "/talent/forms", icon: "▢" },
-      { name: "My Earnings", href: "/talent/earnings", icon: "$" },
+      { name: "Dashboard", href: "/talent/dashboard", icon: LayoutDashboard },
+      { name: "Find Jobs", href: "/talent/jobs", icon: Briefcase },
+      { name: "My Forms", href: "/talent/forms", icon: FileText },
+      { name: "My Earnings", href: "/talent/earnings", icon: DollarSign },
     ],
   },
   {
     label: "ACCOUNT",
     items: [
-      { name: "Profile", href: "/talent/profile", icon: "○" },
-      { name: "Settings", href: "/talent/settings", icon: "⚙" },
-      { name: "Sign Out", href: "/", icon: "→" },
+      { name: "Profile", href: "/talent/profile", icon: User },
+      { name: "Settings", href: "/talent/settings", icon: Settings },
+      { name: "Sign Out", href: "/", icon: LogOut },
     ],
   },
 ];
@@ -51,24 +67,24 @@ const HIRING_NAV = [
   {
     label: "MAIN",
     items: [
-      { name: "Dashboard", href: "/company/dashboard", icon: "◎" },
-      { name: "Browse Talent", href: "/company/browse", icon: "◇" },
-      { name: "Job Postings", href: "/company/jobs", icon: "▤" },
-      { name: "Pipeline", href: "/company/pipeline", icon: "⊞" },
+      { name: "Dashboard", href: "/company/dashboard", icon: LayoutDashboard },
+      { name: "Browse Talent", href: "/company/browse", icon: Users },
+      { name: "Job Postings", href: "/company/jobs", icon: Briefcase },
+      { name: "Pipeline", href: "/company/pipeline", icon: ClipboardList },
     ],
   },
   {
     label: "AI",
     items: [
-      { name: "AI Agents", href: "/company/ai-agents", icon: "⚡" },
-      { name: "Autopilot", href: "/company/autopilot", icon: "↻" },
+      { name: "AI Agents", href: "/company/ai-agents", icon: Cpu },
+      { name: "Autopilot", href: "/company/autopilot", icon: RefreshCw },
     ],
   },
   {
     label: "ACCOUNT",
     items: [
-      { name: "Settings", href: "/company/settings", icon: "⚙" },
-      { name: "Sign Out", href: "/", icon: "→" },
+      { name: "Settings", href: "/company/settings", icon: Settings },
+      { name: "Sign Out", href: "/", icon: LogOut },
     ],
   },
 ];
@@ -77,34 +93,34 @@ const ADMIN_NAV = [
   {
     label: "OVERVIEW",
     items: [
-      { name: "Admin Dashboard", href: "/company/dashboard", icon: "◎" },
-      { name: "All Talent", href: "/company/browse", icon: "◇" },
-      { name: "All Jobs", href: "/company/jobs", icon: "▤" },
-      { name: "Pipeline", href: "/company/pipeline", icon: "⊞" },
+      { name: "Admin Dashboard", href: "/company/dashboard", icon: LayoutDashboard },
+      { name: "All Talent", href: "/company/browse", icon: Users },
+      { name: "All Jobs", href: "/company/jobs", icon: Briefcase },
+      { name: "Pipeline", href: "/company/pipeline", icon: ClipboardList },
     ],
   },
   {
     label: "AI & AUTOMATION",
     items: [
-      { name: "AI Agents", href: "/company/ai-agents", icon: "⚡" },
-      { name: "Autopilot", href: "/company/autopilot", icon: "↻" },
+      { name: "AI Agents", href: "/company/ai-agents", icon: Cpu },
+      { name: "Autopilot", href: "/company/autopilot", icon: RefreshCw },
     ],
   },
   {
     label: "TALENT VIEW",
     items: [
-      { name: "Talent Dashboard", href: "/talent/dashboard", icon: "◎" },
-      { name: "Job Board", href: "/talent/jobs", icon: "◇" },
-      { name: "Forms", href: "/talent/forms", icon: "▢" },
-      { name: "Earnings", href: "/talent/earnings", icon: "$" },
-      { name: "Talent Profile", href: "/talent/profile", icon: "○" },
+      { name: "Talent Dashboard", href: "/talent/dashboard", icon: LayoutDashboard },
+      { name: "Job Board", href: "/talent/jobs", icon: Briefcase },
+      { name: "Forms", href: "/talent/forms", icon: FileText },
+      { name: "Earnings", href: "/talent/earnings", icon: DollarSign },
+      { name: "Talent Profile", href: "/talent/profile", icon: User },
     ],
   },
   {
     label: "SYSTEM",
     items: [
-      { name: "Settings", href: "/company/settings", icon: "⚙" },
-      { name: "Sign Out", href: "/", icon: "→" },
+      { name: "Settings", href: "/company/settings", icon: Settings },
+      { name: "Sign Out", href: "/", icon: LogOut },
     ],
   },
 ];
@@ -244,9 +260,7 @@ export default function DashboardLayout({
                 {VIEW_MODES.find(m => m.key === viewMode)?.label}
               </span>
             </div>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#797979]">
-              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronDown className="w-4 h-4 text-[#797979]" />
           </button>
           {roleDropdownOpen && (
             <>
@@ -305,8 +319,8 @@ export default function DashboardLayout({
                   }}
                   className="flex items-center gap-3 px-6 py-2.5 text-[15px] rounded-[5px] mx-3 transition cursor-pointer text-[#b9b9b9] hover:bg-[#0b0b0b] hover:text-[#ffffff] w-full text-left"
                 >
-                  <span className="w-5 text-center text-[13px] opacity-60">
-                    {item.icon}
+                  <span className="w-5 flex justify-center text-[13px] opacity-60">
+                    <item.icon className="w-4 h-4" />
                   </span>
                   {item.name}
                 </button>
@@ -321,8 +335,8 @@ export default function DashboardLayout({
                     : "text-[#b9b9b9] hover:bg-[#0b0b0b] hover:text-[#ffffff]"
                 }`}
               >
-                <span className="w-5 text-center text-[13px] opacity-60">
-                  {item.icon}
+                <span className="w-5 flex justify-center text-[13px] opacity-60">
+                  <item.icon className="w-4 h-4" />
                 </span>
                 {item.name}
               </Link>
@@ -435,19 +449,7 @@ export default function DashboardLayout({
               className="md:hidden text-[#b9b9b9] hover:text-[#ffffff] transition cursor-pointer"
               aria-label="Open sidebar"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              >
-                <line x1="3" y1="5" x2="17" y2="5" />
-                <line x1="3" y1="10" x2="17" y2="10" />
-                <line x1="3" y1="15" x2="17" y2="15" />
-              </svg>
+              <Menu className="w-5 h-5" />
             </button>
           </div>
 
@@ -468,19 +470,7 @@ export default function DashboardLayout({
                 className="text-[#b9b9b9] hover:text-[#ffffff] transition text-sm cursor-pointer relative"
                 aria-label="Notifications"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M13.5 6.75a4.5 4.5 0 1 0-9 0c0 4.5-2.25 5.625-2.25 5.625h13.5S13.5 11.25 13.5 6.75Z" />
-                  <path d="M10.297 15.375a1.5 1.5 0 0 1-2.594 0" />
-                </svg>
+                <Bell className="w-5 h-5" />
                 {demoMode && (
                   <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#f36458]" />
                 )}
