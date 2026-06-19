@@ -6,6 +6,92 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ═══════════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+   Since components use hardcoded hex colors in Tailwind
+   classes (bg-[#0b0b0b], etc.), we remap them globally
+   when html.light is set.
+   ═══════════════════════════════════════════════ */
+
+/* Light mode color mapping:
+   #0b0b0b (canvas)       → #f8f8f8 (light bg)
+   #212121 (canvas-soft)   → #ffffff (white cards)
+   #353535 (graphite)      → #e0e0e0 (light borders)
+   #797979 (mute)          → #888888 (muted text - kept similar)
+   #b9b9b9 (ash)           → #555555 (body text)
+   #ffffff (white text)    → #1a1a1a (dark text)
+*/
+
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background: #f8f8f8 !important;
+  color: #555555 !important;
+}
+
+/* ── Background overrides ── */
+html.light [class*="bg-[#0b0b0b]"] {
+  background-color: #f8f8f8 !important;
+}
+html.light [class*="bg-[#212121]"] {
+  background-color: #ffffff !important;
+}
+html.light [class*="bg-[#353535]"] {
+  background-color: #e0e0e0 !important;
+}
+
+/* ── Text color overrides ── */
+html.light [class*="text-[#ffffff]"] {
+  color: #1a1a1a !important;
+}
+html.light [class*="text-[#b9b9b9]"] {
+  color: #555555 !important;
+}
+html.light [class*="text-[#797979]"] {
+  color: #888888 !important;
+}
+html.light [class*="text-[#0b0b0b]"] {
+  color: #1a1a1a !important;
+}
+
+/* ── Border overrides ── */
+html.light [class*="border-[#353535]"] {
+  border-color: #e0e0e0 !important;
+}
+html.light [class*="border-[#797979]"] {
+  border-color: #cccccc !important;
+}
+
+/* ── Scrollbar light ── */
+html.light ::-webkit-scrollbar-track {
+  background: #f8f8f8;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* ── Selection ── */
+html.light ::selection {
+  background: rgba(243, 100, 88, 0.2);
+  color: #1a1a1a;
+}
+
+/* ── Input/select backgrounds ── */
+html.light input,
+html.light textarea,
+html.light select {
+  color: #1a1a1a !important;
+}
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #aaaaaa !important;
+}
+
 /* ─── Design Tokens ─── */
 :root {
   --canvas: #0b0b0b;
