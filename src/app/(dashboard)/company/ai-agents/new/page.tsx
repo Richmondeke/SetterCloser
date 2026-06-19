@@ -41,15 +41,50 @@ export default function NewAIAgentPage() {
 
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [agentName, setAgentName] = useState('');
-  const [connectedTools, setConnectedTools] = useState<string[]>([]);
+  
+  const [connectingTool, setConnectingTool] = useState<string | null>(null);
+  const [connectedAccounts, setConnectedAccounts] = useState<Record<string, string>>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("settercloser_composio_accounts");
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  });
+
+  const [connectedTools, setConnectedTools] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("settercloser_composio_accounts");
+        return raw ? Object.keys(JSON.parse(raw)) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+
   const [dailyLimit, setDailyLimit] = useState('50');
   const [autonomous, setAutonomous] = useState(false);
   const [operatingHours, setOperatingHours] = useState('9am-6pm EST');
 
   const toggleTool = (toolId: string) => {
-    setConnectedTools((prev) =>
-      prev.includes(toolId) ? prev.filter((t) => t !== toolId) : [...prev, toolId]
-    );
+    if (connectedTools.includes(toolId)) {
+      setConnectedTools(prev => prev.filter(t => t !== toolId));
+      setConnectedAccounts(prev => {
+        const next = { ...prev };
+        delete next[toolId];
+        if (typeof window !== "undefined") {
+          localStorage.setItem("settercloser_composio_accounts", JSON.stringify(next));
+        }
+        return next;
+      });
+    } else {
+      setConnectingTool(toolId);
+    }
   };
 
   const selectedTemplateData = TEMPLATES.find((t) => t.id === selectedTemplate);
@@ -159,13 +194,19 @@ export default function NewAIAgentPage() {
                         isConnected ? 'border-[#37cd84]' : 'border-[#353535]'
                       }`}
                     >
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-[#ffffff] text-[14px]">{tool.name}</p>
-                        <p className="text-[#797979] text-[11px] mt-0.5">{tool.detail}</p>
+                        <p className="text-[#797979] text-[11px] mt-0.5 truncate">
+                          {isConnected ? (
+                            <span className="text-[#37cd84]">{connectedAccounts[tool.id]}</span>
+                          ) : (
+                            tool.detail
+                          )}
+                        </p>
                       </div>
                       <button
                         onClick={() => toggleTool(tool.id)}
-                        className={`text-[13px] px-3 py-1 rounded-full border transition cursor-pointer ${
+                        className={`text-[13px] px-3 py-1 rounded-full border transition cursor-pointer shrink-0 ${
                           isConnected
                             ? 'border-[#37cd84] text-[#37cd84]'
                             : 'border-[#353535] text-[#b9b9b9] hover:border-[#797979]'
@@ -272,16 +313,17 @@ export default function NewAIAgentPage() {
             <div className="bg-[#0b0b0b] rounded-[5px] p-6 border border-[#353535]">
               <p className="font-mono text-[11px] text-[#797979] uppercase tracking-wider mb-3">Connected Tools</p>
               {connectedTools.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="space-y-2">
                   {connectedTools.map((toolId) => {
                     const tool = TOOLS.find((t) => t.id === toolId);
                     return (
-                      <span
+                      <div
                         key={toolId}
-                        className="bg-[#212121] text-[#37cd84] text-[13px] rounded-full px-3 py-1 border border-[#37cd84]"
+                        className="flex justify-between items-center bg-[#212121] text-[#37cd84] text-[13px] rounded-[5px] px-3 py-2 border border-[#37cd84]/30"
                       >
-                        {tool?.name} ✓
-                      </span>
+                        <span className="font-medium text-white">{tool?.name}</span>
+                        <span className="font-mono text-[11px] text-[#797979]">{connectedAccounts[toolId]}</span>
+                      </div>
                     );
                   })}
                 </div>
@@ -331,6 +373,66 @@ export default function NewAIAgentPage() {
           </button>
         )}
       </div>
+
+      {/* Composio Authorization Modal */}
+      {connectingTool && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#212121] border border-[#353535] rounded-[12px] p-6 max-w-sm w-full">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-[#f36458] text-[20px]">⚡</span>
+              <h3 className="text-[#ffffff] text-[18px] font-medium">Composio Authorization</h3>
+            </div>
+            <p className="text-[#b9b9b9] text-[13px] leading-relaxed mb-6">
+              Authorize <b>{TOOLS.find(t => t.id === connectingTool)?.name}</b> connection to grant the AI agent secure API access.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block font-mono text-[11px] text-[#797979] uppercase tracking-wider mb-2">
+                  Select Account / Email
+                </label>
+                <input
+                  type="text"
+                  id="composio-account-input"
+                  defaultValue={
+                    connectingTool === 'email' ? 'troyhodinni@gmail.com' :
+                    connectingTool === 'crm' ? 'trysettercloser-hubspot' :
+                    connectingTool === 'calendar' ? 'troy_cal' :
+                    'Troy Hodinni (LinkedIn)'
+                  }
+                  className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[40px] text-[#b9b9b9] px-3 focus:border-[#f36458] focus:outline-none text-[14px]"
+                />
+              </div>
+              
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setConnectingTool(null)}
+                  className="flex-1 border border-[#353535] text-[#b9b9b9] rounded-full h-[40px] text-[13px] font-medium hover:border-[#797979] transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    const inputVal = (document.getElementById('composio-account-input') as HTMLInputElement)?.value || 'Connected Account';
+                    setConnectedAccounts(prev => {
+                      const next = { ...prev, [connectingTool]: inputVal };
+                      if (typeof window !== "undefined") {
+                        localStorage.setItem("settercloser_composio_accounts", JSON.stringify(next));
+                      }
+                      return next;
+                    });
+                    setConnectedTools(prev => [...prev, connectingTool]);
+                    setConnectingTool(null);
+                  }}
+                  className="flex-1 bg-[#37cd84] text-[#0b0b0b] rounded-full h-[40px] text-[13px] font-medium hover:opacity-90 transition cursor-pointer"
+                >
+                  Authorize ✓
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

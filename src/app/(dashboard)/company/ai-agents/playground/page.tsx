@@ -36,6 +36,19 @@ export default function AgentPlaygroundPage() {
     closed: 0,
   });
 
+  const [connectedAccounts, setConnectedAccounts] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("settercloser_composio_accounts");
+        if (raw) {
+          setConnectedAccounts(JSON.parse(raw));
+        }
+      } catch (e) {}
+    }
+  }, []);
+
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,9 +85,9 @@ export default function AgentPlaygroundPage() {
 
     // Step 1: Scrape Leads (Apify)
     setCurrentStep(1);
-    addLog("Invoking Apify Actor: @apify/linkedin-people-scraper...", 'tool', 'apify');
+    addLog(`Invoking Apify Actor: @apify/linkedin-people-scraper (Composio auth: ${connectedAccounts.linkedin || 'Troy Hodinni (LinkedIn)'})...`, 'tool', 'apify');
     await delay(2000);
-    addLog("Apify: Querying LinkedIn for 'Founder' + 'SaaS' + 'San Francisco'...", 'info', 'apify');
+    addLog(`Apify: Querying LinkedIn via account: ${connectedAccounts.linkedin || 'Troy Hodinni (LinkedIn)'}...`, 'info', 'apify');
     await delay(1800);
     
     const initialLeads: ScrapedLead[] = [
@@ -89,7 +102,7 @@ export default function AgentPlaygroundPage() {
 
     // Step 2: CRM Integration
     setCurrentStep(2);
-    addLog("Connecting to CRM (HubSpot API)...", 'tool', 'crm');
+    addLog(`Connecting to CRM (HubSpot API - connected as: ${connectedAccounts.crm || 'trysettercloser-hubspot'})...`, 'tool', 'crm');
     await delay(1200);
     
     setLeads(prev => prev.map(l => ({ ...l, status: 'crm_added' })));
@@ -103,17 +116,17 @@ export default function AgentPlaygroundPage() {
     addLog("Drafting highly personalized cold email templates utilizing GPT-4o...", 'info', 'outreach');
     await delay(1500);
     
-    addLog("Outreach: Sending email to sarah@flowstate.io...", 'tool', 'outreach');
+    addLog(`Outreach: Sending email via Gmail API (Sender: ${connectedAccounts.email || 'troyhodinni@gmail.com'}) to sarah@flowstate.io...`, 'tool', 'outreach');
     setLeads(prev => prev.map((l, i) => i === 0 ? { ...l, status: 'email_sent' } : l));
     setCampaignStats(prev => ({ ...prev, emailed: 1 }));
     await delay(1000);
     
-    addLog("Outreach: Sending email to david@hyperscale.co...", 'tool', 'outreach');
+    addLog(`Outreach: Sending email via Gmail API (Sender: ${connectedAccounts.email || 'troyhodinni@gmail.com'}) to david@hyperscale.co...`, 'tool', 'outreach');
     setLeads(prev => prev.map((l, i) => i === 1 ? { ...l, status: 'email_sent' } : l));
     setCampaignStats(prev => ({ ...prev, emailed: 2 }));
     await delay(1000);
 
-    addLog("Outreach: Sending email to elena@zetaauth.com...", 'tool', 'outreach');
+    addLog(`Outreach: Sending email via Gmail API (Sender: ${connectedAccounts.email || 'troyhodinni@gmail.com'}) to elena@zetaauth.com...`, 'tool', 'outreach');
     setLeads(prev => prev.map((l, i) => i === 2 ? { ...l, status: 'email_sent' } : l));
     setCampaignStats(prev => ({ ...prev, emailed: 3 }));
     await delay(1500);
@@ -129,7 +142,7 @@ export default function AgentPlaygroundPage() {
 
     // Step 4: Closing & Payment Link
     setCurrentStep(4);
-    addLog("Payment: Generating Stripe checkout link for '$5,000/mo setup'...", 'tool', 'payment');
+    addLog(`Payment: Generating Stripe checkout link for '$5,000/mo setup' (Calendar connected: ${connectedAccounts.calendar || 'troy_cal'})...`, 'tool', 'payment');
     await delay(1500);
     addLog("Payment: Generated link: https://checkout.stripe.com/pay/trysettercloser_flowstate_sdr", 'info', 'payment');
     addLog("Payment: Automatically sent checkout link to sarah@flowstate.io.", 'success', 'payment');
