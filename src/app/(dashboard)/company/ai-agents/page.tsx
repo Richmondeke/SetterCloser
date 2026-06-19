@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUser } from "@/context/UserContext";
@@ -34,25 +34,51 @@ const DEMO_AGENTS = [
 export default function AIAgentsPage() {
   const router = useRouter();
   const { demoMode } = useUser();
-  const initialAgents = demoMode ? DEMO_AGENTS : [];
+  const [agents, setAgents] = useState<any[]>([]);
+  const [agentStatuses, setAgentStatuses] = useState<Record<string, 'Active' | 'Paused'>>({});
 
-  // Local status state for toggling Pause/Resume
-  const [agentStatuses, setAgentStatuses] = useState<Record<string, 'Active' | 'Paused'>>(() => {
+  useEffect(() => {
+    let customAgents: any[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("settercloser_custom_agents");
+        if (raw) {
+          customAgents = JSON.parse(raw);
+        }
+      } catch (e) {}
+    }
+    const combined = [...(demoMode ? DEMO_AGENTS : []), ...customAgents];
+    setAgents(combined);
+
     const map: Record<string, 'Active' | 'Paused'> = {};
-    initialAgents.forEach((agent) => {
+    combined.forEach((agent) => {
       map[agent.name] = agent.status;
     });
-    return map;
-  });
+    setAgentStatuses(map);
+  }, [demoMode]);
 
   const toggleStatus = (name: string) => {
+    const nextStatus = agentStatuses[name] === 'Active' ? 'Paused' : 'Active';
     setAgentStatuses((prev) => ({
       ...prev,
-      [name]: prev[name] === 'Active' ? 'Paused' : 'Active',
+      [name]: nextStatus,
     }));
+
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("settercloser_custom_agents");
+        if (raw) {
+          const customAgents = JSON.parse(raw);
+          const updated = customAgents.map((a: any) =>
+            a.name === name ? { ...a, status: nextStatus } : a
+          );
+          localStorage.setItem("settercloser_custom_agents", JSON.stringify(updated));
+        }
+      } catch (e) {}
+    }
   };
 
-  const agents = initialAgents.map((agent) => ({
+  const agentsList = agents.map((agent) => ({
     ...agent,
     status: agentStatuses[agent.name] || agent.status,
     statusColor: (agentStatuses[agent.name] || agent.status) === 'Active' ? 'text-[#37cd84]' : 'text-[#797979]',
@@ -84,9 +110,9 @@ export default function AIAgentsPage() {
         </div>
       </div>
 
-      {agents.length > 0 ? (
+      {agentsList.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6 mt-8">
-          {agents.map((agent) => (
+          {agentsList.map((agent) => (
             <div
               key={agent.name}
               className="bg-[#212121] rounded-[12px] p-6 border border-[#353535]"

@@ -334,7 +334,30 @@ export default function NewAIAgentPage() {
 
             <button
               onClick={() => {
-                alert("Agent deployed successfully!");
+                const newAgent = {
+                  name: agentName,
+                  template: (selectedTemplateData?.name || selectedTemplate).toUpperCase(),
+                  status: 'Active',
+                  leadsContacted: 0,
+                  replies: 0,
+                  meetingsBooked: 0,
+                  mode: autonomous ? 'Fully autonomous' : 'Human-in-the-loop',
+                };
+
+                if (typeof window !== "undefined") {
+                  try {
+                    const raw = localStorage.getItem("settercloser_custom_agents");
+                    const existing = raw ? JSON.parse(raw) : [];
+                    localStorage.setItem(
+                      "settercloser_custom_agents",
+                      JSON.stringify([...existing, newAgent])
+                    );
+                  } catch (e) {
+                    console.error("Failed to deploy agent:", e);
+                  }
+                }
+
+                alert(`${agentName} deployed successfully!`);
                 router.push('/company/ai-agents');
               }}
               className="w-full bg-[#f36458] text-[#0b0b0b] rounded-full h-[48px] text-[15px] font-medium hover:opacity-90 transition cursor-pointer"
