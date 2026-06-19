@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
@@ -148,6 +148,27 @@ export default function DashboardLayout({
     viewMode, setViewMode,
   } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNotifications]);
+
+  const DEMO_NOTIFICATIONS = [
+    { text: "New meeting confirmed — James Wilson", time: "2h ago" },
+    { text: "Deal closed — DataSync AI, $12K", time: "1d ago" },
+    { text: "New application received — ScaleUp.io", time: "3d ago" },
+  ];
 
   const navSections = getNavForMode(viewMode);
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
@@ -353,24 +374,53 @@ export default function DashboardLayout({
             >
               {viewMode} mode
             </span>
-            <button
-              className="text-[#b9b9b9] hover:text-[#ffffff] transition text-sm cursor-pointer"
-              aria-label="Notifications"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-[#b9b9b9] hover:text-[#ffffff] transition text-sm cursor-pointer relative"
+                aria-label="Notifications"
               >
-                <path d="M13.5 6.75a4.5 4.5 0 1 0-9 0c0 4.5-2.25 5.625-2.25 5.625h13.5S13.5 11.25 13.5 6.75Z" />
-                <path d="M10.297 15.375a1.5 1.5 0 0 1-2.594 0" />
-              </svg>
-            </button>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M13.5 6.75a4.5 4.5 0 1 0-9 0c0 4.5-2.25 5.625-2.25 5.625h13.5S13.5 11.25 13.5 6.75Z" />
+                  <path d="M10.297 15.375a1.5 1.5 0 0 1-2.594 0" />
+                </svg>
+                {demoMode && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#f36458]" />
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-[#212121] border border-[#353535] rounded-[12px] shadow-lg z-50 overflow-hidden">
+                  <div className="p-4 border-b border-[#353535]">
+                    <p className="text-[#ffffff] text-[14px] font-medium">Notifications</p>
+                  </div>
+                  {demoMode ? (
+                    <div className="divide-y divide-[#353535]">
+                      {DEMO_NOTIFICATIONS.map((n, i) => (
+                        <div key={i} className="p-4 hover:bg-[#0b0b0b]/50 transition">
+                          <p className="text-[#b9b9b9] text-[14px]">{n.text}</p>
+                          <p className="text-[#797979] text-[12px] font-mono mt-1">{n.time}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 text-center">
+                      <p className="text-[#797979] text-[14px]">No new notifications</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="w-7 h-7 rounded-full bg-[#353535] flex items-center justify-center text-[#ffffff] text-[11px] font-medium">
               {userInitials}
             </div>

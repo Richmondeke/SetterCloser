@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useUser } from "@/context/UserContext";
 
 /* ── Demo data ── */
@@ -10,7 +12,7 @@ const DEMO_JOBS = [
     roleType: 'Closer',
     industry: 'SaaS',
     posted: 'Posted 3 days ago',
-    status: 'Active',
+    status: 'Active' as const,
     statusColor: 'text-[#37cd84]',
     applications: 14,
   },
@@ -19,7 +21,7 @@ const DEMO_JOBS = [
     roleType: 'Setter',
     industry: 'Coaching',
     posted: 'Posted 1 week ago',
-    status: 'Active',
+    status: 'Active' as const,
     statusColor: 'text-[#37cd84]',
     applications: 9,
   },
@@ -28,15 +30,38 @@ const DEMO_JOBS = [
     roleType: 'Both',
     industry: 'FinTech',
     posted: 'Posted 2 weeks ago',
-    status: 'Paused',
+    status: 'Paused' as const,
     statusColor: 'text-[#797979]',
     applications: 22,
   },
 ];
 
 export default function JobsPage() {
+  const router = useRouter();
   const { demoMode } = useUser();
-  const jobs = demoMode ? DEMO_JOBS : [];
+  const initialJobs = demoMode ? DEMO_JOBS : [];
+
+  // Local status state for toggling Pause/Resume
+  const [jobStatuses, setJobStatuses] = useState<Record<string, 'Active' | 'Paused'>>(() => {
+    const map: Record<string, 'Active' | 'Paused'> = {};
+    initialJobs.forEach((job) => {
+      map[job.title] = job.status;
+    });
+    return map;
+  });
+
+  const toggleStatus = (title: string) => {
+    setJobStatuses((prev) => ({
+      ...prev,
+      [title]: prev[title] === 'Active' ? 'Paused' : 'Active',
+    }));
+  };
+
+  const jobs = initialJobs.map((job) => ({
+    ...job,
+    status: jobStatuses[job.title] || job.status,
+    statusColor: (jobStatuses[job.title] || job.status) === 'Active' ? 'text-[#37cd84]' : 'text-[#797979]',
+  }));
 
   return (
     <div>
@@ -89,13 +114,22 @@ export default function JobsPage() {
               </div>
 
               <div className="flex gap-4 mt-4 pt-4 border-t border-[#353535]">
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => router.push('/company/jobs/new')}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   Edit
                 </button>
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => toggleStatus(job.title)}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   {job.status === 'Active' ? 'Pause' : 'Resume'}
                 </button>
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => router.push('/company/pipeline')}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   View Applicants
                 </button>
               </div>

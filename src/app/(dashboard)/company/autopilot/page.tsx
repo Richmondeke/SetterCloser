@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 /* ─── Types ─── */
 type RoleType = "Setter" | "Closer" | "Both";
@@ -91,6 +93,8 @@ function statusClasses(s: MatchStatus) {
 
 /* ─────────────────────────────────────────────────────── */
 export default function AutopilotPage() {
+  const router = useRouter();
+  const { demoMode } = useUser();
   const [isActive, setIsActive] = useState(false);
 
   /* ── Form state ── */
@@ -131,7 +135,7 @@ export default function AutopilotPage() {
 
           {/* ── Role Type ── */}
           <FieldLabel>Role Type</FieldLabel>
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             {(["Setter", "Closer", "Both"] as RoleType[]).map((r) => (
               <button
                 key={r}
@@ -185,7 +189,7 @@ export default function AutopilotPage() {
 
           {/* ── Compensation Model ── */}
           <FieldLabel>Compensation Model</FieldLabel>
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
             {(["Commission Only", "Base + Commission", "Per Meeting"] as CompModel[]).map((c) => (
               <button
                 key={c}
@@ -277,6 +281,7 @@ export default function AutopilotPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
+            onClick={() => setIsActive(false)}
             className="text-[#b9b9b9] text-[13px] hover:text-[#ffffff] transition cursor-pointer"
           >
             Edit Criteria
@@ -292,7 +297,7 @@ export default function AutopilotPage() {
       </div>
 
       {/* ── Stats row ── */}
-      <div className="grid grid-cols-4 gap-4 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-8">
         {[
           { value: "12", label: "Matches Found" },
           { value: "8", label: "Auto-Invited" },
@@ -322,6 +327,15 @@ export default function AutopilotPage() {
           Your Top Matches
         </h2>
 
+        {!demoMode ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <span className="text-[32px] mb-3 opacity-30">🔍</span>
+            <p className="text-[#ffffff] text-[16px]">No autopilot matches yet</p>
+            <p className="text-[#797979] text-[14px] mt-1 max-w-xs">
+              Autopilot is scanning for talent that matches your criteria. Check back soon.
+            </p>
+          </div>
+        ) : (
         <div className="space-y-4">
           {MATCHES.map((m) => (
             <div
@@ -362,12 +376,14 @@ export default function AutopilotPage() {
                 <div className="flex items-center gap-4 mt-1">
                   <button
                     type="button"
+                    onClick={() => router.push('/company/browse')}
                     className="text-[#55beff] text-[13px] cursor-pointer hover:opacity-80 transition"
                   >
                     View Profile
                   </button>
                   <button
                     type="button"
+                    onClick={() => alert("Scheduling coming soon")}
                     className="text-[#55beff] text-[13px] cursor-pointer hover:opacity-80 transition"
                   >
                     Schedule Call
@@ -377,6 +393,7 @@ export default function AutopilotPage() {
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* ── Activity Log ── */}

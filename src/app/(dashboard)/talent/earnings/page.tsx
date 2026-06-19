@@ -247,7 +247,7 @@ export default function EarningsPage() {
           <p className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">
             VERIFIED EARNINGS
           </p>
-          <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">
+          <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">
             My Earnings
           </h1>
         </div>
@@ -327,7 +327,7 @@ export default function EarningsPage() {
       )}
 
       {/* ── Stats Row ── */}
-      <div className="grid grid-cols-4 gap-4 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-8">
         {stats.map((s) => (
           <div
             key={s.label}

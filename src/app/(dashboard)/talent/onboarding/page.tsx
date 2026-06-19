@@ -172,7 +172,7 @@ export default function OnboardingPage() {
           <Card>
             <h2 className="text-[#ffffff] text-[32px] tracking-[-0.32px] font-normal">What&apos;s your role?</h2>
             <p className="text-[#797979] mt-2">Select the type of sales work you do</p>
-            <div className="grid grid-cols-3 gap-4 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
               {[
                 { id: "setter", label: "Setter", desc: "I book meetings & qualify leads" },
                 { id: "closer", label: "Closer", desc: "I run demos & close deals" },

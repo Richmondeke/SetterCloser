@@ -52,7 +52,7 @@ export default function NewFormPage() {
         </Link>
       </div>
       <p className="mono-eyebrow">NEW FORM</p>
-      <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">
+      <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">
         Generate Confirmation Link
       </h1>
       <p className="text-[#797979] text-[15px] mt-2">

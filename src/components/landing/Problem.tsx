@@ -28,7 +28,7 @@ export default function Problem() {
             <p className="font-mono text-[13px] text-[#797979] uppercase tracking-[0.05em] mb-6">
               Why SetterCloser
             </p>
-            <h2 className="text-[#ffffff] font-normal text-[32px] sm:text-[40px] lg:text-[48px] tracking-[-1.68px] leading-[1.08] max-w-3xl">
+            <h2 className="text-[#ffffff] font-normal text-[32px] sm:text-[40px] lg:text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] leading-[1.08] max-w-3xl">
               The old way of hiring sales reps is broken
             </h2>
           </div>

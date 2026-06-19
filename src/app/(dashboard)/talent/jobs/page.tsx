@@ -139,6 +139,7 @@ export default function JobsPage() {
   const { demoMode } = useUser();
   const JOBS = demoMode ? DEMO_JOBS : [];
 
+  const [appliedJobs, setAppliedJobs] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleType | null>(null);
   const [industryFilter, setIndustryFilter] = useState<Industry | null>(null);
@@ -187,7 +188,7 @@ export default function JobsPage() {
     <div className="w-full">
       {/* ── Header ── */}
       <p className="mono-eyebrow">JOB BOARD</p>
-      <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">
+      <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">
         Find Jobs
       </h1>
 
@@ -357,13 +358,30 @@ export default function JobsPage() {
                     </span>
                   )}
                 </div>
-                <div className="text-right shrink-0 ml-4">
-                  <span className="text-[#37cd84] text-[15px] font-medium block">
-                    {job.comp}
-                  </span>
-                  <span className="text-[#797979] text-[12px] block mt-0.5">
-                    {job.dealSize}
-                  </span>
+                <div className="flex items-center gap-4 shrink-0 ml-4">
+                  <div className="text-right">
+                    <span className="text-[#37cd84] text-[15px] font-medium block">
+                      {job.comp}
+                    </span>
+                    <span className="text-[#797979] text-[12px] block mt-0.5">
+                      {job.dealSize}
+                    </span>
+                  </div>
+                  {appliedJobs.has(i) ? (
+                    <span className="bg-[#37cd84]/10 text-[#37cd84] border border-[#37cd84]/20 text-[13px] rounded-full px-4 py-1.5">
+                      Applied ✓
+                    </span>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAppliedJobs((prev) => new Set(prev).add(i));
+                      }}
+                      className="bg-[#f36458] text-[#ffffff] text-[13px] rounded-full px-4 py-1.5 hover:opacity-90 transition cursor-pointer"
+                    >
+                      Apply
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -43,10 +43,10 @@ export default function FormsPage() {
   return (
     <div className="w-full">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div>
           <p className="mono-eyebrow">CONFIRMATIONS</p>
-          <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">My Forms</h1>
+          <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">My Forms</h1>
         </div>
         <Link
           href="/talent/forms/new"
@@ -57,7 +57,7 @@ export default function FormsPage() {
       </div>
 
       {/* ── Stats ── */}
-      <div className="grid grid-cols-4 gap-4 mt-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-8">
         {[
           { value: stats.sent, label: "Forms Sent" },
           { value: stats.filled, label: "Forms Filled" },
@@ -74,8 +74,8 @@ export default function FormsPage() {
       {/* ── Forms List ── */}
       {forms.length > 0 ? (
         <div className="mt-8 space-y-3">
-          {/* Table Header */}
-          <div className="grid grid-cols-[1fr_140px_160px_120px_80px_100px] gap-4 px-6 py-2">
+          {/* Table Header — hidden on mobile */}
+          <div className="hidden lg:grid grid-cols-[1fr_140px_160px_120px_80px_100px] gap-4 px-6 py-2">
             <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">Form</span>
             <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">Prospect</span>
             <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">Status</span>
@@ -89,24 +89,44 @@ export default function FormsPage() {
             return (
               <div
                 key={f.slug}
-                className="bg-[#212121] rounded-[12px] border border-[#353535] hover:border-[#797979] transition grid grid-cols-[1fr_140px_160px_120px_80px_100px] gap-4 px-6 py-4 items-center"
+                className="bg-[#212121] rounded-[12px] border border-[#353535] hover:border-[#797979] transition px-5 py-4 lg:grid lg:grid-cols-[1fr_140px_160px_120px_80px_100px] lg:gap-4 lg:items-center"
               >
-                <div>
+                {/* Mobile: stacked card layout */}
+                <div className="flex items-start justify-between lg:block">
                   <span className="text-[#ffffff] text-[15px]">{f.title}</span>
+                  <div className="flex items-center gap-1.5 lg:hidden">
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.bg }} />
+                    <span className="text-[12px]" style={{ color: sc.color }}>{sc.label}</span>
+                  </div>
                 </div>
-                <span className="text-[#b9b9b9] text-[13px]">{f.prospect}</span>
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: sc.bg }}
-                  />
-                  <span className="text-[13px]" style={{ color: sc.color }}>
-                    {sc.label}
-                  </span>
+
+                {/* Mobile meta row */}
+                <div className="flex items-center gap-4 mt-2 lg:hidden">
+                  <span className="text-[#b9b9b9] text-[12px]">{f.prospect}</span>
+                  <span className="text-[#797979] text-[12px]">•</span>
+                  <span className="text-[#797979] text-[12px]">{f.meeting}</span>
+                  <span className="text-[#797979] text-[12px]">•</span>
+                  <span className="text-[#797979] text-[12px]">{f.created}</span>
                 </div>
-                <span className="text-[#797979] text-[13px]">{f.meeting}</span>
-                <span className="text-[#797979] text-[13px]">{f.created}</span>
-                <div className="text-right">
+                <div className="mt-3 lg:hidden">
+                  <button
+                    onClick={() => copyLink(f.slug)}
+                    className="text-[13px] cursor-pointer transition hover:opacity-80"
+                    style={{ color: copiedSlug === f.slug ? "#37cd84" : "#55beff" }}
+                  >
+                    {copiedSlug === f.slug ? "Copied!" : "Copy Link →"}
+                  </button>
+                </div>
+
+                {/* Desktop: inline columns (hidden on mobile) */}
+                <span className="hidden lg:block text-[#b9b9b9] text-[13px]">{f.prospect}</span>
+                <div className="hidden lg:flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: sc.bg }} />
+                  <span className="text-[13px]" style={{ color: sc.color }}>{sc.label}</span>
+                </div>
+                <span className="hidden lg:block text-[#797979] text-[13px]">{f.meeting}</span>
+                <span className="hidden lg:block text-[#797979] text-[13px]">{f.created}</span>
+                <div className="hidden lg:block text-right">
                   <button
                     onClick={() => copyLink(f.slug)}
                     className="text-[13px] cursor-pointer transition hover:opacity-80"

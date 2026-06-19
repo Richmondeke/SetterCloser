@@ -20,10 +20,10 @@ const socialLinks = ["Twitter", "LinkedIn", "GitHub", "Discord"];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0b0b0b] py-[64px] px-6 border-t border-[#353535]">
+    <footer className="bg-[#0b0b0b] py-10 md:py-[64px] px-4 md:px-6 border-t border-[#353535]">
       <FadeIn>
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-6 gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 md:gap-12">
           {/* Brand lockup — spans 2 columns */}
           <div className="md:col-span-2">
             <div className="flex items-center">

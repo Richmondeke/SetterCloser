@@ -1,6 +1,7 @@
 "use client";
 
 import { SlideUp } from "@/components/motion";
+import Link from "next/link";
 
 const STATS = [
   { value: "500+", label: "Sales Pros" },
@@ -44,12 +45,12 @@ export default function Hero() {
           {/* CTA Row */}
           <SlideUp delay={0.45}>
             <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
-              <a href="/sign-up" className="btn-primary w-full sm:w-auto">
+              <Link href="/sign-up" className="btn-primary w-full sm:w-auto">
                 Start Hiring
-              </a>
-              <a href="/sign-up" className="btn-ghost w-full sm:w-auto">
+              </Link>
+              <Link href="/sign-up" className="btn-ghost w-full sm:w-auto">
                 I&apos;m a Sales Rep
-              </a>
+              </Link>
             </div>
           </SlideUp>
 

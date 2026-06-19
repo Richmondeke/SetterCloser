@@ -268,3 +268,36 @@ body {
   border-radius: 12px;
   padding: 2rem;
 }
+
+/* ─── Mobile Responsive Utilities ─── */
+
+/* Responsive sections */
+@media (max-width: 767px) {
+  .section-dark,
+  .section-light,
+  .section-paper {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .card-dark,
+  .card-light,
+  .card-brand {
+    padding: 1.25rem;
+  }
+}
+
+/* ─── Dashboard Mobile Overrides ─── */
+@media (max-width: 767px) {
+  /* Main content area */
+  main {
+    padding: 1rem !important;
+  }
+
+  /* Fix overflow on all dashboard pages */
+  .w-full {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+

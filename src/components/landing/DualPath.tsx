@@ -20,14 +20,14 @@ const aiFeatures = [
 
 export default function DualPath() {
   return (
-    <section className="bg-[#0b0b0b] py-[96px] px-6">
+    <section className="bg-[#0b0b0b] py-12 md:py-[96px] px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Eyebrow + Headline */}
         <FadeIn>
           <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
             Choose Your Path
           </p>
-          <h2 className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal text-center max-w-3xl mx-auto mt-4">
+          <h2 className="text-[#ffffff] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal text-center max-w-3xl mx-auto mt-4">
             Human reps or AI agents — your call
           </h2>
         </FadeIn>

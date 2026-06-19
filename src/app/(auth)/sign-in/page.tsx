@@ -12,6 +12,7 @@ export default function SignInPage() {
   const { signIn } = useUser();
   const [role, setRole] = useState<Role>(null);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,9 +67,14 @@ export default function SignInPage() {
           <input
             type="password"
             placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
-          <span className="text-[#55beff] text-[13px] text-right block mt-1 cursor-pointer hover:underline transition">
+          <span
+            onClick={() => alert("Password reset coming soon")}
+            className="text-[#55beff] text-[13px] text-right block mt-1 cursor-pointer hover:underline transition"
+          >
             Forgot password?
           </span>
         </div>

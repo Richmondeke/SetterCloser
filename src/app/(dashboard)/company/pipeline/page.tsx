@@ -54,7 +54,7 @@ export default function PipelinePage() {
   return (
     <div>
       <p className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">Pipeline</p>
-      <h1 className="text-[#ffffff] text-[38px] font-normal tracking-[-0.38px] mt-1">
+      <h1 className="text-[#ffffff] text-[28px] md:text-[38px] font-normal tracking-[-0.28px] md:tracking-[-0.38px] mt-1">
         Hiring Pipeline
       </h1>
 

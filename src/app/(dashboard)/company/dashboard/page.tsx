@@ -63,7 +63,7 @@ export default function CompanyDashboardPage() {
       <h1 className="text-[#ffffff] text-[38px] font-normal tracking-[-0.38px] mt-1">Dashboard</h1>
 
       {/* Stats Row */}
-      <StaggerContainer staggerDelay={0.1} className="grid grid-cols-4 gap-4 mt-8">
+      <StaggerContainer staggerDelay={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-8">
         {stats.map((stat) => (
           <StaggerItem key={stat.label}>
             <div

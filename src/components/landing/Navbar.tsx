@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
@@ -28,12 +29,12 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-[64px] items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-[#f36458]" />
             <span className="text-[#ffffff] font-normal text-lg tracking-tight">
               SetterCloser
             </span>
-          </a>
+          </Link>
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-8">
@@ -50,15 +51,15 @@ export default function Navbar() {
 
           {/* Desktop CTAs */}
           <div className="hidden md:flex items-center gap-3">
-            <a
+            <Link
               href="/sign-in"
               className="text-[16px] text-[#b9b9b9] hover:text-white px-4 py-2 transition-colors duration-200"
             >
               Sign In
-            </a>
-            <a href="/sign-up" className="btn-primary">
+            </Link>
+            <Link href="/sign-up" className="btn-primary">
               Get Started
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Hamburger */}
@@ -99,15 +100,15 @@ export default function Navbar() {
             </a>
           ))}
           <div className="pt-3 border-t border-[#353535] flex flex-col gap-2">
-            <a
+            <Link
               href="/sign-in"
               className="text-[16px] text-center text-[#b9b9b9] hover:text-white py-2 transition-colors"
             >
               Sign In
-            </a>
-            <a href="/sign-up" className="btn-primary text-center">
+            </Link>
+            <Link href="/sign-up" className="btn-primary text-center">
               Get Started
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -58,10 +58,10 @@ export default function TalentDashboardPage() {
     <div className="w-full">
       {/* ── Header ── */}
       <p className="mono-eyebrow">OVERVIEW</p>
-      <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">Dashboard</h1>
+      <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">Dashboard</h1>
 
       {/* ── Stats Row ── */}
-      <StaggerContainer staggerDelay={0.1} className="grid grid-cols-4 gap-4 mt-8">
+      <StaggerContainer staggerDelay={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
         {stats.map((s) => (
           <StaggerItem key={s.label}>
             <div className="bg-[#212121] rounded-[12px] p-6 border border-[#353535]">

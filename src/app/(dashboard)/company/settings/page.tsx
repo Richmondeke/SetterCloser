@@ -1,8 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 export default function CompanySettingsPage() {
+  const router = useRouter();
+  const { companyData, demoMode, signOut } = useUser();
+
+  const [companyName, setCompanyName] = useState(
+    demoMode ? "ScaleUp.io" : (companyData.companyName || "")
+  );
+  const [website, setWebsite] = useState(
+    demoMode ? "https://scaleup.io" : (companyData.website || "")
+  );
+  const displayEmail = demoMode ? "admin@scaleup.io" : "";
+
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [matchAlerts, setMatchAlerts] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(false);
@@ -13,7 +26,7 @@ export default function CompanySettingsPage() {
       <p className="font-mono text-[11px] text-[#797979] uppercase tracking-wider">
         Account
       </p>
-      <h1 className="text-[#ffffff] text-[38px] tracking-[-1.14px] font-normal mt-1">
+      <h1 className="text-[#ffffff] text-[28px] md:text-[38px] tracking-[-0.84px] md:tracking-[-1.14px] font-normal mt-1">
         Settings
       </h1>
 
@@ -29,7 +42,8 @@ export default function CompanySettingsPage() {
             </label>
             <input
               type="text"
-              defaultValue="ScaleUp.io"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
               className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition"
             />
           </div>
@@ -39,7 +53,7 @@ export default function CompanySettingsPage() {
             </label>
             <input
               type="email"
-              defaultValue="admin@scaleup.io"
+              value={displayEmail}
               readOnly
               className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#797979] h-[44px] px-3 text-[16px] cursor-not-allowed"
             />
@@ -50,7 +64,8 @@ export default function CompanySettingsPage() {
             </label>
             <input
               type="text"
-              defaultValue="https://scaleup.io"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
               className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition"
             />
           </div>
@@ -111,6 +126,16 @@ export default function CompanySettingsPage() {
         </div>
       </div>
 
+      {/* Save Changes */}
+      <div className="mt-4">
+        <button
+          onClick={() => alert("Settings saved!")}
+          className="bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] px-6 font-medium cursor-pointer transition hover:opacity-90"
+        >
+          Save Changes
+        </button>
+      </div>
+
       {/* Billing */}
       <div className="bg-[#212121] rounded-[12px] p-8 border border-[#353535] mt-4">
         <h2 className="text-[#ffffff] text-[24px] tracking-[-0.24px] font-normal">
@@ -123,7 +148,10 @@ export default function CompanySettingsPage() {
               Pro — $199/mo
             </p>
           </div>
-          <button className="bg-transparent text-[#b9b9b9] rounded-full h-[36px] px-4 text-[13px] border border-[#353535] hover:text-white hover:border-[#b9b9b9] transition-colors cursor-pointer">
+          <button
+            onClick={() => alert("Billing portal coming soon")}
+            className="bg-transparent text-[#b9b9b9] rounded-full h-[36px] px-4 text-[13px] border border-[#353535] hover:text-white hover:border-[#b9b9b9] transition-colors cursor-pointer"
+          >
             Manage Billing
           </button>
         </div>
@@ -137,7 +165,15 @@ export default function CompanySettingsPage() {
         <p className="text-[#797979] text-[15px] mt-2">
           Permanently delete your company account and all associated data.
         </p>
-        <button className="mt-4 text-[#dd0000] text-[15px] font-medium hover:underline cursor-pointer">
+        <button
+          onClick={() => {
+            if (confirm("Are you sure you want to delete your company account? This action cannot be undone.")) {
+              signOut();
+              router.push("/");
+            }
+          }}
+          className="mt-4 text-[#dd0000] text-[15px] font-medium hover:underline cursor-pointer"
+        >
           Delete Account
         </button>
       </div>

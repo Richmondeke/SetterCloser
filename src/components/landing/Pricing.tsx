@@ -31,14 +31,14 @@ const enterpriseFeatures = [
 
 export default function Pricing() {
   return (
-    <section id="pricing" className="bg-[#ffffff] py-[96px] px-6">
+    <section id="pricing" className="bg-[#ffffff] py-12 md:py-[96px] px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Eyebrow + Headline + Subtitle */}
         <FadeIn>
           <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
             Pricing
           </p>
-          <h2 className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
+          <h2 className="text-[#0b0b0b] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal text-center mt-4">
             Simple, transparent pricing
           </h2>
           <p className="text-[#797979] text-[18px] text-center mt-4">
@@ -54,7 +54,7 @@ export default function Pricing() {
               <h3 className="text-[#0b0b0b] text-[24px] tracking-[-0.24px] font-normal">
                 Starter
               </h3>
-              <p className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal mt-2">
+              <p className="text-[#0b0b0b] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal mt-2">
                 Free
               </p>
               <p className="text-[#797979] text-[16px] mt-2">
@@ -86,7 +86,7 @@ export default function Pricing() {
                 Pro
               </h3>
               <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-[#ffffff] text-[48px] tracking-[-1.68px] font-normal">
+                <span className="text-[#ffffff] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal">
                   $199
                 </span>
                 <span className="text-[#b9b9b9] text-[18px]">/mo</span>
@@ -119,7 +119,7 @@ export default function Pricing() {
               <h3 className="text-[#0b0b0b] text-[24px] tracking-[-0.24px] font-normal">
                 Enterprise
               </h3>
-              <p className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal mt-2">
+              <p className="text-[#0b0b0b] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal mt-2">
                 Custom
               </p>
               <p className="text-[#797979] text-[16px] mt-2">

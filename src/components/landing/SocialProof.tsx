@@ -28,14 +28,14 @@ const testimonials = [
 
 export default function SocialProof() {
   return (
-    <section className="bg-[#ededed] py-[96px] px-6">
+    <section className="bg-[#ededed] py-12 md:py-[96px] px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Eyebrow + Headline */}
         <FadeIn>
           <p className="font-mono text-[13px] text-[#797979] uppercase tracking-wider text-center">
             Trusted By Sales Leaders
           </p>
-          <h2 className="text-[#0b0b0b] text-[48px] tracking-[-1.68px] font-normal text-center mt-4">
+          <h2 className="text-[#0b0b0b] text-[28px] sm:text-[36px] md:text-[48px] tracking-[-0.84px] md:tracking-[-1.68px] font-normal text-center mt-4">
             Results that speak for themselves
           </h2>
         </FadeIn>

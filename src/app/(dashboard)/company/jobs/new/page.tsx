@@ -71,7 +71,7 @@ export default function NewJobPage() {
             <label className="block font-mono text-[11px] text-[#797979] uppercase tracking-wider mb-2">
               Role Type
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {ROLE_TYPES.map((role) => (
                 <button
                   key={role}

@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useUser } from "@/context/UserContext";
 
 /* ── Demo data ── */
@@ -8,7 +10,7 @@ const DEMO_AGENTS = [
   {
     name: 'Aria',
     template: 'COLD OUTBOUND',
-    status: 'Active',
+    status: 'Active' as const,
     statusColor: 'text-[#37cd84]',
     dotColor: 'bg-[#37cd84]',
     leadsContacted: 142,
@@ -19,7 +21,7 @@ const DEMO_AGENTS = [
   {
     name: 'Nova',
     template: 'INBOUND QUALIFIER',
-    status: 'Paused',
+    status: 'Paused' as const,
     statusColor: 'text-[#797979]',
     dotColor: 'bg-[#797979]',
     leadsContacted: 89,
@@ -30,8 +32,32 @@ const DEMO_AGENTS = [
 ];
 
 export default function AIAgentsPage() {
+  const router = useRouter();
   const { demoMode } = useUser();
-  const agents = demoMode ? DEMO_AGENTS : [];
+  const initialAgents = demoMode ? DEMO_AGENTS : [];
+
+  // Local status state for toggling Pause/Resume
+  const [agentStatuses, setAgentStatuses] = useState<Record<string, 'Active' | 'Paused'>>(() => {
+    const map: Record<string, 'Active' | 'Paused'> = {};
+    initialAgents.forEach((agent) => {
+      map[agent.name] = agent.status;
+    });
+    return map;
+  });
+
+  const toggleStatus = (name: string) => {
+    setAgentStatuses((prev) => ({
+      ...prev,
+      [name]: prev[name] === 'Active' ? 'Paused' : 'Active',
+    }));
+  };
+
+  const agents = initialAgents.map((agent) => ({
+    ...agent,
+    status: agentStatuses[agent.name] || agent.status,
+    statusColor: (agentStatuses[agent.name] || agent.status) === 'Active' ? 'text-[#37cd84]' : 'text-[#797979]',
+    dotColor: (agentStatuses[agent.name] || agent.status) === 'Active' ? 'bg-[#37cd84]' : 'bg-[#797979]',
+  }));
 
   return (
     <div>
@@ -92,13 +118,22 @@ export default function AIAgentsPage() {
 
               {/* Actions */}
               <div className="flex gap-4 mt-4 pt-4 border-t border-[#353535]">
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => router.push('/company/ai-agents/new')}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   Configure
                 </button>
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => toggleStatus(agent.name)}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   {agent.status === 'Active' ? 'Pause' : 'Resume'}
                 </button>
-                <button className="text-[#55beff] text-[13px] hover:underline cursor-pointer">
+                <button
+                  onClick={() => alert("Activity log coming soon")}
+                  className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                >
                   View Activity
                 </button>
               </div>
