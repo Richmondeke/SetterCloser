@@ -146,6 +146,7 @@ export default function DashboardLayout({
     userName, userInitials, userRole, companyData, signOut,
     demoMode, toggleDemoMode,
     viewMode, setViewMode,
+    hydrated, isAuthenticated, onboardingComplete,
   } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -163,6 +164,36 @@ export default function DashboardLayout({
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
+
+  // ── Auth guard: redirect to sign-in if not authenticated ──
+  useEffect(() => {
+    if (hydrated && !isAuthenticated) {
+      router.push('/sign-in');
+    }
+  }, [hydrated, isAuthenticated, router]);
+
+  // Check if we're currently on an onboarding page (exempt from onboarding guard)
+  const isOnboardingPage = pathname.includes('/onboarding');
+
+  // ── Onboarding guard: redirect to onboarding if not complete ──
+  useEffect(() => {
+    if (hydrated && isAuthenticated && !onboardingComplete && !isOnboardingPage) {
+      if (userRole === 'talent') {
+        router.push('/talent/onboarding');
+      } else if (userRole === 'company') {
+        router.push('/company/onboarding');
+      }
+    }
+  }, [hydrated, isAuthenticated, onboardingComplete, userRole, router, isOnboardingPage]);
+
+  // Show nothing until hydration is complete to prevent flash
+  if (!hydrated) return null;
+
+  // Show nothing while redirecting unauthenticated users
+  if (!isAuthenticated) return null;
+
+  // Show nothing while redirecting to onboarding (but NOT if we're already on onboarding)
+  if (isAuthenticated && !onboardingComplete && !isOnboardingPage) return null;
 
   const DEMO_NOTIFICATIONS = [
     { text: "New meeting confirmed — James Wilson", time: "2h ago" },

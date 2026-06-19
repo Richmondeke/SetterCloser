@@ -316,7 +316,16 @@ export default function NewAIAgentPage() {
         {step < 2 && (
           <button
             onClick={() => setStep((s) => s + 1)}
-            className="bg-[#ffffff] text-[#0b0b0b] rounded-full px-8 h-[44px] text-[14px] font-medium hover:opacity-90 transition cursor-pointer"
+            disabled={
+              (step === 0 && !selectedTemplate) ||
+              (step === 1 && !agentName.trim())
+            }
+            className={`bg-[#ffffff] text-[#0b0b0b] rounded-full px-8 h-[44px] text-[14px] font-medium hover:opacity-90 transition cursor-pointer ${
+              (step === 0 && !selectedTemplate) ||
+              (step === 1 && !agentName.trim())
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
           >
             Continue
           </button>

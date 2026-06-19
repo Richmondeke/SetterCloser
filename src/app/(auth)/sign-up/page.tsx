@@ -14,10 +14,27 @@ export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
+    if (name.trim().length < 2) {
+      setError("Name must be at least 2 characters.");
+      return;
+    }
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (!role) {
+      setError("Please select a role.");
+      return;
+    }
+    setError("");
     signUp(name, email, role);
     if (role === "talent") {
       router.push("/talent/onboarding");
@@ -55,7 +72,7 @@ export default function SignUpPage() {
             type="text"
             placeholder="Jane Smith"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => { setName(e.target.value); setError(""); }}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
         </div>
@@ -69,7 +86,7 @@ export default function SignUpPage() {
             type="email"
             placeholder="jane@company.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
         </div>
@@ -83,7 +100,7 @@ export default function SignUpPage() {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setError(""); }}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
         </div>
@@ -96,7 +113,7 @@ export default function SignUpPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setRole("talent")}
+              onClick={() => { setRole("talent"); setError(""); }}
               className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
                 role === "talent"
                   ? "border-[#f36458]"
@@ -113,7 +130,7 @@ export default function SignUpPage() {
 
             <button
               type="button"
-              onClick={() => setRole("company")}
+              onClick={() => { setRole("company"); setError(""); }}
               className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
                 role === "company"
                   ? "border-[#f36458]"
@@ -139,6 +156,9 @@ export default function SignUpPage() {
           >
             Create Account
           </button>
+          {error && (
+            <p className="text-[#f36458] text-[13px] mt-2">{error}</p>
+          )}
         </div>
       </form>
 

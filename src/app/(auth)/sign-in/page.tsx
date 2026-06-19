@@ -13,10 +13,23 @@ export default function SignInPage() {
   const [role, setRole] = useState<Role>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role) return;
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 1) {
+      setError("Please enter your password.");
+      return;
+    }
+    if (!role) {
+      setError("Please select a role.");
+      return;
+    }
+    setError("");
     signIn(email, role);
     if (role === "talent") {
       router.push("/talent/dashboard");
@@ -54,7 +67,7 @@ export default function SignInPage() {
             type="email"
             placeholder="jane@company.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
         </div>
@@ -68,7 +81,7 @@ export default function SignInPage() {
             type="password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setError(""); }}
             className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-3 text-[16px] focus:border-[#f36458] focus:outline-none transition placeholder:text-[#353535]"
           />
           <span
@@ -87,7 +100,7 @@ export default function SignInPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setRole("talent")}
+              onClick={() => { setRole("talent"); setError(""); }}
               className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
                 role === "talent"
                   ? "border-[#f36458]"
@@ -104,7 +117,7 @@ export default function SignInPage() {
 
             <button
               type="button"
-              onClick={() => setRole("company")}
+              onClick={() => { setRole("company"); setError(""); }}
               className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
                 role === "company"
                   ? "border-[#f36458]"
@@ -130,6 +143,9 @@ export default function SignInPage() {
           >
             Sign In
           </button>
+          {error && (
+            <p className="text-[#f36458] text-[13px] mt-2">{error}</p>
+          )}
         </div>
       </form>
 

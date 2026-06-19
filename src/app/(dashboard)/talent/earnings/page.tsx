@@ -102,7 +102,20 @@ export default function EarningsPage() {
     setEarnings(demoMode ? DEMO_INITIAL_EARNINGS : []);
   }, [demoMode]);
 
-  const stats = demoMode ? DEMO_STATS : EMPTY_STATS;
+  const stats = (() => {
+    if (demoMode) return DEMO_STATS;
+    if (earnings.length === 0) return EMPTY_STATS;
+    const totalEarned = earnings.reduce((sum, e) => sum + e.amount, 0);
+    const dealsCount = earnings.length;
+    const avgDealSize = dealsCount > 0 ? Math.round(totalEarned / dealsCount) : 0;
+    const pendingCount = earnings.filter((e) => e.status === "Pending").length;
+    return [
+      { value: `$${totalEarned.toLocaleString("en-US")}`, label: "Total Earned", accent: "text-[#37cd84]" },
+      { value: `${dealsCount}`, label: "Deals Closed", accent: "text-[#ffffff]" },
+      { value: `$${avgDealSize.toLocaleString("en-US")}`, label: "Avg Deal Size", accent: "text-[#ffffff]" },
+      { value: `${pendingCount}`, label: "Pending", accent: "text-[#ffffff]" },
+    ];
+  })();
 
   /* ── toast helper ── */
   const pushToast = useCallback((company: string) => {

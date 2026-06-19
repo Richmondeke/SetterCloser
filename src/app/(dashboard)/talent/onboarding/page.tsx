@@ -421,7 +421,23 @@ export default function OnboardingPage() {
           ) : (
             <div />
           )}
-          <button onClick={next} className="bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] px-8 font-medium cursor-pointer transition hover:opacity-90">
+          <button
+            onClick={next}
+            disabled={
+              (step === 0 && !form.role) ||
+              (step === 1 && form.industries.length === 0) ||
+              (step === 2 && form.frameworks.length === 0) ||
+              (step === 3 && !form.compensation)
+            }
+            className={`bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] px-8 font-medium cursor-pointer transition hover:opacity-90 ${
+              (step === 0 && !form.role) ||
+              (step === 1 && form.industries.length === 0) ||
+              (step === 2 && form.frameworks.length === 0) ||
+              (step === 3 && !form.compensation)
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
+          >
             Continue
           </button>
         </div>

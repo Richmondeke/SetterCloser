@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 type UserRole = "talent" | "company" | null;
 type ViewMode = "admin" | "hiring" | "setter" | "closer";
@@ -17,6 +17,7 @@ interface TalentData {
   portfolioUrl: string;
   videoIntroUrl: string;
   timezone: string;
+  availability: string;
 }
 
 interface CompanyData {
@@ -37,6 +38,7 @@ interface UserContextType {
   userName: string;
   userEmail: string;
   userInitials: string;
+  isAdmin: boolean;
 
   // Profile data
   talentData: TalentData;
@@ -60,6 +62,9 @@ interface UserContextType {
   // View mode (role switcher)
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+
+  // Hydration
+  hydrated: boolean;
 }
 
 const defaultTalentData: TalentData = {
@@ -74,6 +79,7 @@ const defaultTalentData: TalentData = {
   portfolioUrl: "",
   videoIntroUrl: "",
   timezone: "",
+  availability: "",
 };
 
 const defaultCompanyData: CompanyData = {
@@ -98,7 +104,52 @@ const ADMIN_EMAILS = [
 const isAdminEmail = (email: string) =>
   ADMIN_EMAILS.includes(email.toLowerCase().trim());
 
+// ── localStorage helpers ──
+const STORAGE_KEY = "settercloser_user";
+
+interface PersistedState {
+  isAuthenticated: boolean;
+  userRole: UserRole;
+  userName: string;
+  userEmail: string;
+  talentData: TalentData;
+  companyData: CompanyData;
+  onboardingComplete: boolean;
+  demoMode: boolean;
+  viewMode: ViewMode;
+}
+
+function loadState(): PersistedState | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as PersistedState;
+  } catch {
+    return null;
+  }
+}
+
+function saveState(state: PersistedState) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Storage full or unavailable — silently ignore
+  }
+}
+
+function clearState() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Silently ignore
+  }
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
+  const [hydrated, setHydrated] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [userName, setUserName] = useState("");
@@ -109,11 +160,46 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [demoMode, setDemoMode] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("setter");
 
+  // ── Hydrate from localStorage on mount ──
+  useEffect(() => {
+    const saved = loadState();
+    if (saved) {
+      setIsAuthenticated(saved.isAuthenticated);
+      setUserRole(saved.userRole);
+      setUserName(saved.userName);
+      setUserEmail(saved.userEmail);
+      setTalentData({ ...defaultTalentData, ...saved.talentData });
+      setCompanyData({ ...defaultCompanyData, ...saved.companyData });
+      setOnboardingComplete(saved.onboardingComplete);
+      setDemoMode(saved.demoMode);
+      setViewMode(saved.viewMode);
+    }
+    setHydrated(true);
+  }, []);
+
+  // ── Persist to localStorage on every state change ──
+  useEffect(() => {
+    if (!hydrated) return;
+    saveState({
+      isAuthenticated,
+      userRole,
+      userName,
+      userEmail,
+      talentData,
+      companyData,
+      onboardingComplete,
+      demoMode,
+      viewMode,
+    });
+  }, [hydrated, isAuthenticated, userRole, userName, userEmail, talentData, companyData, onboardingComplete, demoMode, viewMode]);
+
   const toggleDemoMode = () => setDemoMode((prev) => !prev);
 
   const userInitials = userName
     ? userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
     : "??";
+
+  const isAdmin = isAdminEmail(userEmail);
 
   const signUp = (name: string, email: string, role: UserRole) => {
     setUserName(name);
@@ -155,6 +241,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setCompanyData(defaultCompanyData);
     setOnboardingComplete(false);
     setViewMode("setter");
+    clearState();
   };
 
   const updateTalentData = (data: Partial<TalentData>) => {
@@ -171,12 +258,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider value={{
-      isAuthenticated, userRole, userName, userEmail, userInitials,
+      isAuthenticated, userRole, userName, userEmail, userInitials, isAdmin,
       talentData, companyData,
       signUp, signIn, signOut, updateTalentData, updateCompanyData, completeOnboarding,
       onboardingComplete,
       demoMode, toggleDemoMode,
       viewMode, setViewMode,
+      hydrated,
     }}>
       {children}
     </UserContext.Provider>

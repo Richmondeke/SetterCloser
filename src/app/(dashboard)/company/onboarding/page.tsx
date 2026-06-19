@@ -346,7 +346,16 @@ export default function CompanyOnboardingPage() {
               }
               setStep((s) => s + 1);
             }}
-            className="bg-[#ffffff] text-[#0b0b0b] rounded-full px-8 h-[44px] text-[14px] font-medium hover:opacity-90 transition cursor-pointer"
+            disabled={
+              (step === 0 && !companyName.trim()) ||
+              (step === 1 && !roleType)
+            }
+            className={`bg-[#ffffff] text-[#0b0b0b] rounded-full px-8 h-[44px] text-[14px] font-medium hover:opacity-90 transition cursor-pointer ${
+              (step === 0 && !companyName.trim()) ||
+              (step === 1 && !roleType)
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
           >
             Continue
           </button>
