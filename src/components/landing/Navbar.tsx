@@ -28,11 +28,11 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-[64px] items-center justify-between">
+        <div className="flex h-[80px] items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="bg-white rounded-[6px] px-2 py-1">
-              <Image src="/logo.jpg" alt="SetterCloser" width={140} height={28} className="h-6 w-auto" />
+            <div className="bg-white rounded-[6px] px-3 py-1.5">
+              <Image src="/logo.jpg" alt="SetterCloser" width={350} height={70} className="h-[60px] w-auto" />
             </div>
           </Link>
 
