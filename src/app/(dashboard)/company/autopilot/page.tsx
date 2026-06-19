@@ -75,7 +75,29 @@ const ACTIVITY_LOG = [
   { text: "Autopilot activated with criteria: Closer · SaaS · Trust 7+", time: "1 day ago" },
 ];
 
-const INDUSTRIES = ["SaaS", "Coaching", "E-Com", "Agency", "FinTech", "Healthcare"] as const;
+const INDUSTRIES = [
+  'SaaS', 'FinTech', 'AI / ML', 'Cybersecurity', 'Cloud / DevOps', 'MarTech', 'EdTech', 'HealthTech',
+  'Agency', 'Consulting', 'Coaching', 'Recruiting / Staffing', 'Legal', 'Accounting',
+  'E-Commerce', 'Retail', 'Wholesale / Distribution', 'Marketplace',
+  'Insurance', 'Financial Services', 'Wealth Management', 'Lending / Mortgage',
+  'Healthcare', 'Pharma / Biotech', 'Wellness / Fitness', 'Mental Health',
+  'Real Estate', 'PropTech', 'Construction',
+  'Media / Entertainment', 'Advertising', 'Events', 'Gaming',
+  'Energy / Utilities', 'Solar / Renewables', 'CleanTech',
+  'Manufacturing', 'Logistics / Supply Chain', 'Automotive',
+  'Nonprofit', 'Government / Public Sector', 'Education',
+  'Telecom', 'Hardware / IoT',
+  'Crypto / Web3', 'Food & Beverage', 'Travel / Hospitality', 'Sports', 'Agriculture',
+] as const;
+
+const FRAMEWORKS = ['SPIN Selling', 'Sandler', 'Challenger', 'MEDDIC', 'Solution Selling', 'Consultative', 'BANT', 'NEPQ', 'Gap Selling', 'Command of the Sale', 'Value Selling', 'Miller Heiman'];
+
+const TIMEZONES = [
+  'Any Timezone',
+  'UTC-8 (PST)', 'UTC-7 (MST)', 'UTC-6 (CST)', 'UTC-5 (EST)',
+  'UTC+0 (GMT)', 'UTC+1 (CET)', 'UTC+2 (EET)', 'UTC+3 (MSK)',
+  'UTC+5:30 (IST)', 'UTC+8 (SGT)', 'UTC+9 (JST)', 'UTC+10 (AEST)',
+];
 
 /* ─── Status badge colours ─── */
 function statusClasses(s: MatchStatus) {
@@ -100,10 +122,14 @@ export default function AutopilotPage() {
   /* ── Form state ── */
   const [roleType, setRoleType] = useState<RoleType | null>(null);
   const [industries, setIndustries] = useState<string[]>([]);
+  const [industrySearch, setIndustrySearch] = useState("");
+  const [customIndustry, setCustomIndustry] = useState("");
+  const [selFrameworks, setSelFrameworks] = useState<string[]>([]);
   const [trustScore, setTrustScore] = useState(7);
   const [compModel, setCompModel] = useState<CompModel | null>(null);
   const [budget, setBudget] = useState("");
   const [experience, setExperience] = useState("Any");
+  const [timezone, setTimezone] = useState("Any Timezone");
   const [autoInvite, setAutoInvite] = useState(true);
   const [autoSchedule, setAutoSchedule] = useState(true);
 
@@ -111,6 +137,23 @@ export default function AutopilotPage() {
     setIndustries((prev) =>
       prev.includes(ind) ? prev.filter((i) => i !== ind) : [...prev, ind]
     );
+
+  const toggleFramework = (fw: string) =>
+    setSelFrameworks((prev) =>
+      prev.includes(fw) ? prev.filter((f) => f !== fw) : [...prev, fw]
+    );
+
+  const addCustomIndustry = () => {
+    const trimmed = customIndustry.trim();
+    if (trimmed && !industries.includes(trimmed)) {
+      setIndustries((prev) => [...prev, trimmed]);
+      setCustomIndustry("");
+    }
+  };
+
+  const filteredIndustries = industrySearch
+    ? INDUSTRIES.filter((ind) => ind.toLowerCase().includes(industrySearch.toLowerCase()))
+    : INDUSTRIES;
 
   /* ────────── SETUP MODE ────────── */
   if (!isActive) {
@@ -152,21 +195,77 @@ export default function AutopilotPage() {
             ))}
           </div>
 
-          {/* ── Industries ── */}
-          <FieldLabel>Industries</FieldLabel>
-          <div className="flex flex-wrap gap-2 mb-6">
-            {INDUSTRIES.map((ind) => (
+          {/* ── Industries (searchable + custom) ── */}
+          <FieldLabel>Preferred Industries</FieldLabel>
+          <input
+            type="text"
+            value={industrySearch}
+            onChange={(e) => setIndustrySearch(e.target.value)}
+            className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[36px] text-[#b9b9b9] px-3 text-[13px] focus:border-[#f36458] focus:outline-none transition mb-2"
+            placeholder="Search industries..."
+          />
+          {industries.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {industries.map((ind) => (
+                <button
+                  key={ind}
+                  type="button"
+                  onClick={() => toggleIndustry(ind)}
+                  className="rounded-full px-3 py-1 text-[12px] border border-[#f36458] text-[#ffffff] bg-[#f36458]/10 cursor-pointer transition flex items-center gap-1"
+                >
+                  {ind} <span className="text-[#f36458] text-[10px]">✕</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto mb-2">
+            {filteredIndustries
+              .filter((ind) => !industries.includes(ind))
+              .map((ind) => (
+                <button
+                  key={ind}
+                  type="button"
+                  onClick={() => toggleIndustry(ind)}
+                  className="rounded-full px-3 py-1 text-[12px] border border-[#353535] text-[#797979] bg-[#0b0b0b] hover:border-[#b9b9b9] hover:text-[#b9b9b9] transition cursor-pointer"
+                >
+                  {ind}
+                </button>
+              ))}
+          </div>
+          <div className="flex gap-2 mb-6">
+            <input
+              type="text"
+              value={customIndustry}
+              onChange={(e) => setCustomIndustry(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomIndustry(); } }}
+              className="flex-1 bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[34px] text-[#b9b9b9] px-3 text-[13px] focus:border-[#f36458] focus:outline-none transition"
+              placeholder="Add custom industry..."
+            />
+            <button
+              type="button"
+              onClick={addCustomIndustry}
+              className="bg-[#353535] text-[#b9b9b9] rounded-[3px] px-3 h-[34px] text-[13px] hover:bg-[#797979] hover:text-[#ffffff] transition cursor-pointer"
+            >
+              Add
+            </button>
+          </div>
+
+          {/* ── Required Frameworks ── */}
+          <FieldLabel>Sales Frameworks</FieldLabel>
+          <p className="text-[#797979] text-[12px] mb-2 -mt-1">Match talent who are trained in these methodologies</p>
+          <div className="flex flex-wrap gap-1.5 mb-6">
+            {FRAMEWORKS.map((fw) => (
               <button
-                key={ind}
+                key={fw}
                 type="button"
-                onClick={() => toggleIndustry(ind)}
-                className={`rounded-full px-4 py-1.5 text-[13px] border cursor-pointer transition ${
-                  industries.includes(ind)
-                    ? "bg-[#f36458] border-[#f36458] text-[#0b0b0b]"
-                    : "bg-[#0b0b0b] border-[#353535] text-[#b9b9b9] hover:border-[#797979]"
+                onClick={() => toggleFramework(fw)}
+                className={`rounded-full px-3 py-1.5 text-[12px] border cursor-pointer transition ${
+                  selFrameworks.includes(fw)
+                    ? "border-[#f36458] text-[#ffffff] bg-[#f36458]/10"
+                    : "border-[#353535] text-[#797979] bg-[#0b0b0b] hover:border-[#b9b9b9]"
                 }`}
               >
-                {ind}
+                {fw}
               </button>
             ))}
           </div>
@@ -189,13 +288,13 @@ export default function AutopilotPage() {
 
           {/* ── Compensation Model ── */}
           <FieldLabel>Compensation Model</FieldLabel>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             {(["Commission Only", "Base + Commission", "Per Meeting"] as CompModel[]).map((c) => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setCompModel(c)}
-                className={`bg-[#0b0b0b] border rounded-[5px] p-4 text-[15px] cursor-pointer transition ${
+                className={`bg-[#0b0b0b] border rounded-[5px] p-3 text-[13px] cursor-pointer transition ${
                   compModel === c
                     ? "border-[#f36458] text-[#ffffff]"
                     : "border-[#353535] text-[#b9b9b9] hover:border-[#797979]"
@@ -204,17 +303,31 @@ export default function AutopilotPage() {
                 {c}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setCompModel(null)}
+              className={`bg-[#0b0b0b] border rounded-[5px] p-3 text-[13px] cursor-pointer transition ${
+                compModel === null
+                  ? "border-[#f36458] text-[#ffffff]"
+                  : "border-[#353535] text-[#b9b9b9] hover:border-[#797979]"
+              }`}
+            >
+              Any
+            </button>
           </div>
 
           {/* ── Max Budget ── */}
           <FieldLabel>Maximum Budget</FieldLabel>
-          <input
-            type="text"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            placeholder="$5,000/mo"
-            className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-4 text-[15px] focus:border-[#f36458] focus:outline-none transition mb-6"
-          />
+          <div className="relative mb-6">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#797979]">$</span>
+            <input
+              type="text"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value.replace(/[^0-9,]/g, ''))}
+              placeholder="5,000/mo"
+              className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] pl-7 pr-4 text-[15px] focus:border-[#f36458] focus:outline-none transition"
+            />
+          </div>
 
           {/* ── Min Experience ── */}
           <FieldLabel>Minimum Experience</FieldLabel>
@@ -226,7 +339,22 @@ export default function AutopilotPage() {
             <option>Any</option>
             <option>1+ years</option>
             <option>2+ years</option>
+            <option>3+ years</option>
             <option>5+ years</option>
+            <option>7+ years</option>
+            <option>10+ years</option>
+          </select>
+
+          {/* ── Timezone ── */}
+          <FieldLabel>Preferred Timezone</FieldLabel>
+          <select
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] text-[#b9b9b9] h-[44px] px-4 text-[15px] focus:border-[#f36458] focus:outline-none transition mb-6 appearance-none cursor-pointer"
+          >
+            {TIMEZONES.map((tz) => (
+              <option key={tz}>{tz}</option>
+            ))}
           </select>
 
           {/* ── Toggles ── */}

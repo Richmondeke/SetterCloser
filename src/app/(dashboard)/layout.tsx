@@ -149,6 +149,7 @@ export default function DashboardLayout({
     hydrated, isAuthenticated, onboardingComplete,
   } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -220,34 +221,67 @@ export default function DashboardLayout({
         </span>
       </div>
 
-      {/* ── Role Switcher ── */}
+      {/* ── Role Switcher (Dropdown) ── */}
       <div className="px-3 pt-4 pb-2">
         <span className="font-mono text-[11px] text-[#797979] uppercase tracking-wider px-3 mb-2 block">
           View As
         </span>
-        <div className="grid grid-cols-2 gap-1.5">
-          {VIEW_MODES.map((mode) => (
-            <button
-              key={mode.key}
-              onClick={() => handleViewModeChange(mode.key)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-[6px] text-[12px] cursor-pointer transition ${
-                viewMode === mode.key
-                  ? "bg-[#0b0b0b] border border-[#353535]"
-                  : "hover:bg-[#0b0b0b]/50 border border-transparent"
-              }`}
-            >
+        <div className="relative px-1">
+          <button
+            onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
+            className="w-full flex items-center justify-between gap-2 bg-[#0b0b0b] border border-[#353535] rounded-[6px] px-3 py-2.5 cursor-pointer hover:border-[#797979] transition"
+          >
+            <div className="flex items-center gap-2">
               <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{ backgroundColor: viewMode === mode.key ? mode.color : "#353535" }}
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ backgroundColor: VIEW_MODES.find(m => m.key === viewMode)?.color }}
               />
               <span
-                className="font-medium"
-                style={{ color: viewMode === mode.key ? mode.color : "#797979" }}
+                className="text-[13px] font-medium"
+                style={{ color: VIEW_MODES.find(m => m.key === viewMode)?.color }}
               >
-                {mode.label}
+                {VIEW_MODES.find(m => m.key === viewMode)?.label}
               </span>
-            </button>
-          ))}
+            </div>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-[#797979]">
+              <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          {roleDropdownOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setRoleDropdownOpen(false)} />
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#212121] border border-[#353535] rounded-[8px] overflow-hidden z-50 shadow-lg shadow-black/30">
+                {VIEW_MODES.map((mode) => (
+                  <button
+                    key={mode.key}
+                    onClick={() => {
+                      handleViewModeChange(mode.key);
+                      setRoleDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2.5 text-[13px] cursor-pointer transition ${
+                      viewMode === mode.key
+                        ? 'bg-[#0b0b0b]'
+                        : 'hover:bg-[#0b0b0b]/50'
+                    }`}
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ backgroundColor: viewMode === mode.key ? mode.color : "#353535" }}
+                    />
+                    <span
+                      className="font-medium"
+                      style={{ color: viewMode === mode.key ? mode.color : "#797979" }}
+                    >
+                      {mode.label}
+                    </span>
+                    {viewMode === mode.key && (
+                      <span className="ml-auto text-[11px]" style={{ color: mode.color }}>✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
