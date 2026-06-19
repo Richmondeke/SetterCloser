@@ -46,7 +46,7 @@ interface UserContextType {
 
   // Actions
   signUp: (name: string, email: string, role: UserRole) => void;
-  signIn: (email: string, role: UserRole) => void;
+  signIn: (email: string, role?: UserRole) => void;
   signOut: () => void;
   updateTalentData: (data: Partial<TalentData>) => void;
   updateCompanyData: (data: Partial<CompanyData>) => void;
@@ -241,16 +241,33 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signIn = (email: string, role: UserRole) => {
+  const signIn = (email: string, role?: UserRole) => {
+    let resolvedRole: UserRole = role || null;
+    if (!resolvedRole) {
+      const persisted = loadState();
+      if (persisted && persisted.userEmail.toLowerCase().trim() === email.toLowerCase().trim()) {
+        resolvedRole = persisted.userRole;
+      } else if (isAdminEmail(email)) {
+        resolvedRole = "company";
+      } else {
+        const lowerEmail = email.toLowerCase();
+        if (lowerEmail.includes("company") || lowerEmail.includes("agency") || lowerEmail.includes("hr") || lowerEmail.includes("hiring")) {
+          resolvedRole = "company";
+        } else {
+          resolvedRole = "talent";
+        }
+      }
+    }
+
     setUserEmail(email);
-    setUserRole(role);
-    setUserName(role === "company" ? "ScaleUp.io" : "Jane Smith");
+    setUserRole(resolvedRole);
+    setUserName(resolvedRole === "company" ? "ScaleUp.io" : "Jane Smith");
     setIsAuthenticated(true);
     setOnboardingComplete(true);
     // Admin emails get admin mode automatically
     if (isAdminEmail(email)) {
       setViewMode("admin");
-    } else if (role === "company") {
+    } else if (resolvedRole === "company") {
       setViewMode("hiring");
     } else {
       setViewMode("setter");

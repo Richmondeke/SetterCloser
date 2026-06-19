@@ -6,12 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useUser } from "@/context/UserContext";
 
-type Role = "talent" | "company" | null;
-
 export default function SignInPage() {
   const router = useRouter();
   const { signIn } = useUser();
-  const [role, setRole] = useState<Role>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,16 +23,38 @@ export default function SignInPage() {
       setError("Please enter your password.");
       return;
     }
-    if (!role) {
-      setError("Please select a role.");
-      return;
-    }
     setError("");
-    signIn(email, role);
-    if (role === "talent") {
-      router.push("/talent/dashboard");
-    } else if (role === "company") {
+
+    // Resolve redirect path dynamically
+    const isAdmin = ["ekerichmond@gmail.com", "troyhodinni@gmail.com"].includes(email.toLowerCase().trim());
+    
+    let resolvedRole = "talent";
+    if (typeof window !== "undefined") {
+      try {
+        const persistedRaw = localStorage.getItem("settercloser_user");
+        if (persistedRaw) {
+          const parsed = JSON.parse(persistedRaw);
+          if (parsed.userEmail && parsed.userEmail.toLowerCase().trim() === email.toLowerCase().trim()) {
+            resolvedRole = parsed.userRole || "talent";
+          }
+        }
+      } catch (e) {}
+    }
+    
+    // Heuristics fallback
+    if (resolvedRole === "talent" && !isAdmin) {
+      const lowerEmail = email.toLowerCase();
+      if (lowerEmail.includes("company") || lowerEmail.includes("agency") || lowerEmail.includes("hr") || lowerEmail.includes("hiring")) {
+        resolvedRole = "company";
+      }
+    }
+
+    signIn(email);
+
+    if (isAdmin || resolvedRole === "company") {
       router.push("/company/dashboard");
+    } else {
+      router.push("/talent/dashboard");
     }
   };
 
@@ -93,54 +112,11 @@ export default function SignInPage() {
           </span>
         </div>
 
-        {/* Role Selection */}
-        <div className="pt-2">
-          <label className="font-mono text-[11px] text-[#797979] uppercase tracking-wider mb-2 block">
-            Sign in as&hellip;
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => { setRole("talent"); setError(""); }}
-              className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
-                role === "talent"
-                  ? "border-[#f36458]"
-                  : "border-[#353535] hover:border-[#797979]"
-              }`}
-            >
-              <span className="text-[#ffffff] text-[16px] block">
-                Sales Rep
-              </span>
-              <span className="text-[#797979] text-[13px] block mt-1">
-                Setter or Closer
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => { setRole("company"); setError(""); }}
-              className={`bg-[#0b0b0b] border rounded-[5px] p-4 cursor-pointer transition text-left ${
-                role === "company"
-                  ? "border-[#f36458]"
-                  : "border-[#353535] hover:border-[#797979]"
-              }`}
-            >
-              <span className="text-[#ffffff] text-[16px] block">
-                Hiring Company
-              </span>
-              <span className="text-[#797979] text-[13px] block mt-1">
-                Sales leader
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* Submit */}
         <div className="pt-2">
           <button
             type="submit"
-            disabled={!role}
-            className="w-full bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] font-medium text-[16px] cursor-pointer transition hover:opacity-90 hover:-translate-y-px disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] font-medium text-[16px] cursor-pointer transition hover:opacity-90 hover:-translate-y-px"
           >
             Sign In
           </button>
