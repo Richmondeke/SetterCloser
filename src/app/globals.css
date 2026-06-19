@@ -158,6 +158,10 @@ body {
   overflow-x: hidden;
 }
 
+input, textarea, select, button {
+  font-family: inherit;
+}
+
 ::selection {
   background: rgba(243, 100, 88, 0.3);
   color: #fff;
