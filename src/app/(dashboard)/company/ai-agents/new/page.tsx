@@ -43,6 +43,16 @@ export default function NewAIAgentPage() {
   const [agentName, setAgentName] = useState('');
   
   const [connectingTool, setConnectingTool] = useState<string | null>(null);
+  const [composioApiKey, setComposioApiKey] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("settercloser_composio_api_key") || "";
+    }
+    return "";
+  });
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
+  const [authRedirectUrl, setAuthRedirectUrl] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [connectedAccounts, setConnectedAccounts] = useState<Record<string, string>>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -71,6 +81,65 @@ export default function NewAIAgentPage() {
   const [autonomous, setAutonomous] = useState(false);
   const [operatingHours, setOperatingHours] = useState('9am-6pm EST');
 
+  const handleComposioConnect = async () => {
+    if (!connectingTool) return;
+    
+    setIsAuthorizing(true);
+    setErrorMessage("");
+    
+    try {
+      const res = await fetch("/api/composio/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-composio-key": composioApiKey,
+        },
+        body: JSON.stringify({
+          appName: connectingTool,
+          userId: "user_troy",
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to connect toolkit");
+      }
+      
+      if (data.redirectUrl) {
+        setAuthRedirectUrl(data.redirectUrl);
+        window.open(data.redirectUrl, "_blank");
+        
+        if (typeof window !== "undefined") {
+          localStorage.setItem("settercloser_composio_api_key", composioApiKey);
+        }
+      } else {
+        throw new Error("No redirect URL returned by Composio");
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || "An error occurred during authentication.");
+      setIsAuthorizing(false);
+    }
+  };
+
+  const handleCompleteConnection = () => {
+    if (!connectingTool) return;
+    const accountInput = (document.getElementById('composio-account-input') as HTMLInputElement)?.value || 'Connected Account';
+    
+    setConnectedAccounts(prev => {
+      const next = { ...prev, [connectingTool]: accountInput };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("settercloser_composio_accounts", JSON.stringify(next));
+      }
+      return next;
+    });
+    setConnectedTools(prev => [...prev, connectingTool]);
+    
+    setConnectingTool(null);
+    setAuthRedirectUrl("");
+    setIsAuthorizing(false);
+    setErrorMessage("");
+  };
+
   const toggleTool = (toolId: string) => {
     if (connectedTools.includes(toolId)) {
       setConnectedTools(prev => prev.filter(t => t !== toolId));
@@ -84,6 +153,9 @@ export default function NewAIAgentPage() {
       });
     } else {
       setConnectingTool(toolId);
+      setAuthRedirectUrl("");
+      setIsAuthorizing(false);
+      setErrorMessage("");
     }
   };
 
@@ -399,20 +471,42 @@ export default function NewAIAgentPage() {
 
       {/* Composio Authorization Modal */}
       {connectingTool && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#212121] border border-[#353535] rounded-[12px] p-6 max-w-sm w-full">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#212121] border border-[#353535] rounded-[12px] p-6 max-w-sm w-full shadow-2xl">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-[#f36458] text-[20px]">⚡</span>
-              <h3 className="text-[#ffffff] text-[18px] font-medium">Composio Authorization</h3>
+              <span className="text-[#f36458] text-[20px] animate-pulse">⚡</span>
+              <h3 className="text-[#ffffff] text-[18px] font-medium">Composio Integration</h3>
             </div>
-            <p className="text-[#b9b9b9] text-[13px] leading-relaxed mb-6">
-              Authorize <b>{TOOLS.find(t => t.id === connectingTool)?.name}</b> connection to grant the AI agent secure API access.
-            </p>
             
+            <p className="text-[#b9b9b9] text-[13px] leading-relaxed mb-6">
+              Connect <b>{TOOLS.find(t => t.id === connectingTool)?.name}</b> using your Composio account keys to automate outreach workflows.
+            </p>
+
             <div className="space-y-4">
+              {/* API Key Input */}
               <div>
-                <label className="block font-mono text-[11px] text-[#797979] uppercase tracking-wider mb-2">
-                  Select Account / Email
+                <label className="block font-mono text-[10px] text-[#797979] uppercase tracking-wider mb-1.5">
+                  Composio API Key
+                </label>
+                <input
+                  type="password"
+                  placeholder="e.g. comp_key_..."
+                  value={composioApiKey}
+                  onChange={(e) => {
+                    setComposioApiKey(e.target.value);
+                    setErrorMessage("");
+                  }}
+                  className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[40px] text-[#b9b9b9] px-3 focus:border-[#f36458] focus:outline-none text-[13px]"
+                />
+                <span className="text-[10px] text-[#797979] block mt-1">
+                  Find your key at <a href="https://app.composio.dev/settings" target="_blank" rel="noreferrer" className="text-[#55beff] hover:underline">app.composio.dev</a>
+                </span>
+              </div>
+
+              {/* Account Handle / Label */}
+              <div>
+                <label className="block font-mono text-[10px] text-[#797979] uppercase tracking-wider mb-1.5">
+                  Account Name / Label
                 </label>
                 <input
                   type="text"
@@ -423,34 +517,70 @@ export default function NewAIAgentPage() {
                     connectingTool === 'calendar' ? 'troy_cal' :
                     'Troy Hodinni (LinkedIn)'
                   }
-                  className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[40px] text-[#b9b9b9] px-3 focus:border-[#f36458] focus:outline-none text-[14px]"
+                  className="w-full bg-[#0b0b0b] border border-[#353535] rounded-[3px] h-[40px] text-[#b9b9b9] px-3 focus:border-[#f36458] focus:outline-none text-[13px]"
                 />
               </div>
-              
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setConnectingTool(null)}
-                  className="flex-1 border border-[#353535] text-[#b9b9b9] rounded-full h-[40px] text-[13px] font-medium hover:border-[#797979] transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    const inputVal = (document.getElementById('composio-account-input') as HTMLInputElement)?.value || 'Connected Account';
-                    setConnectedAccounts(prev => {
-                      const next = { ...prev, [connectingTool]: inputVal };
-                      if (typeof window !== "undefined") {
-                        localStorage.setItem("settercloser_composio_accounts", JSON.stringify(next));
-                      }
-                      return next;
-                    });
-                    setConnectedTools(prev => [...prev, connectingTool]);
-                    setConnectingTool(null);
-                  }}
-                  className="flex-1 bg-[#37cd84] text-[#0b0b0b] rounded-full h-[40px] text-[13px] font-medium hover:opacity-90 transition cursor-pointer"
-                >
-                  Authorize ✓
-                </button>
+
+              {/* Error Message */}
+              {errorMessage && (
+                <p className="text-[#f36458] text-[12px] bg-[#f36458]/10 p-2.5 rounded border border-[#f36458]/20">{errorMessage}</p>
+              )}
+
+              {/* Dynamic Action Buttons */}
+              <div className="pt-2 border-t border-[#353535]/30">
+                {!authRedirectUrl ? (
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setConnectingTool(null)}
+                      className="flex-1 border border-[#353535] text-[#b9b9b9] rounded-full h-[40px] text-[13px] font-medium hover:border-[#797979] transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isAuthorizing || !composioApiKey.trim()}
+                      onClick={handleComposioConnect}
+                      className="flex-1 bg-[#f36458] text-[#0b0b0b] rounded-full h-[40px] text-[13px] font-medium hover:opacity-90 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                    >
+                      {isAuthorizing ? "Connecting..." : "Connect Tool"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-[#37cd84]/10 rounded border border-[#37cd84]/20 text-center">
+                      <p className="text-[#37cd84] text-[12px] font-medium">✓ Redirect Link Generated</p>
+                      <p className="text-[#b9b9b9] text-[11px] mt-1">Complete sign-in in the opened tab.</p>
+                      <button
+                        type="button"
+                        onClick={() => window.open(authRedirectUrl, "_blank")}
+                        className="text-[#55beff] text-[11px] hover:underline mt-1 bg-transparent border-none cursor-pointer font-mono"
+                      >
+                        Re-open OAuth Tab ↗
+                      </button>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setConnectingTool(null);
+                          setAuthRedirectUrl("");
+                          setIsAuthorizing(false);
+                        }}
+                        className="flex-1 border border-[#353535] text-[#b9b9b9] rounded-full h-[40px] text-[13px] font-medium hover:border-[#797979] transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCompleteConnection}
+                        className="flex-1 bg-[#37cd84] text-[#0b0b0b] rounded-full h-[40px] text-[13px] font-medium hover:opacity-90 transition cursor-pointer"
+                      >
+                        Authorized ✓
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
