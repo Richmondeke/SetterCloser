@@ -142,6 +142,7 @@ export default function BrowseTalentPage() {
   const [availableOnly, setAvailableOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortKey>('trustScore');
+  const [invitedTalent, setInvitedTalent] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     let results = TALENT.filter((t) => {
@@ -422,6 +423,23 @@ export default function BrowseTalentPage() {
                     </span>
                   </div>
                   <span className="text-[#b9b9b9] text-[13px]">{t.comp}</span>
+                </div>
+
+                {/* Invite to Apply */}
+                <div className="mt-3 text-right">
+                  {invitedTalent.has(t.name) ? (
+                    <span className="text-[#37cd84] text-[13px]">Invitation sent ✓</span>
+                  ) : (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInvitedTalent((prev) => new Set(prev).add(t.name));
+                      }}
+                      className="text-[#55beff] text-[13px] hover:underline cursor-pointer"
+                    >
+                      Invite to Apply
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

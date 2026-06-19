@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* ─── Design Tokens ─── */
 :root {
   --canvas: #0b0b0b;

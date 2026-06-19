@@ -203,7 +203,10 @@ export default function NewJobPage() {
 
           {/* Submit */}
           <button
-            onClick={() => router.push('/company/jobs')}
+            onClick={() => {
+              alert("Job posted successfully!");
+              router.push('/company/jobs');
+            }}
             className="w-full bg-[#ffffff] text-[#0b0b0b] rounded-full h-[48px] text-[15px] font-medium hover:opacity-90 transition cursor-pointer mt-4"
           >
             Publish Job

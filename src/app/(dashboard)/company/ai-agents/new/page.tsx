@@ -291,7 +291,10 @@ export default function NewAIAgentPage() {
             </div>
 
             <button
-              onClick={() => router.push('/company/ai-agents')}
+              onClick={() => {
+                alert("Agent deployed successfully!");
+                router.push('/company/ai-agents');
+              }}
               className="w-full bg-[#f36458] text-[#0b0b0b] rounded-full h-[48px] text-[15px] font-medium hover:opacity-90 transition cursor-pointer"
             >
               Deploy Agent

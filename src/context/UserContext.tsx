@@ -89,6 +89,15 @@ const defaultCompanyData: CompanyData = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// Admin email whitelist — these users auto-get admin viewMode
+const ADMIN_EMAILS = [
+  "ekerichmond@gmail.com",
+  "troyhodinni@gmail.com",
+];
+
+const isAdminEmail = (email: string) =>
+  ADMIN_EMAILS.includes(email.toLowerCase().trim());
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>(null);
@@ -111,9 +120,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserEmail(email);
     setUserRole(role);
     setIsAuthenticated(true);
-    // Set view mode based on sign-up role
-    if (role === "company") setViewMode("hiring");
-    else setViewMode("setter");
+    // Admin emails get admin mode automatically
+    if (isAdminEmail(email)) {
+      setViewMode("admin");
+    } else if (role === "company") {
+      setViewMode("hiring");
+    } else {
+      setViewMode("setter");
+    }
   };
 
   const signIn = (email: string, role: UserRole) => {
@@ -122,8 +136,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserName(role === "company" ? "ScaleUp.io" : "Jane Smith");
     setIsAuthenticated(true);
     setOnboardingComplete(true);
-    if (role === "company") setViewMode("hiring");
-    else setViewMode("setter");
+    // Admin emails get admin mode automatically
+    if (isAdminEmail(email)) {
+      setViewMode("admin");
+    } else if (role === "company") {
+      setViewMode("hiring");
+    } else {
+      setViewMode("setter");
+    }
   };
 
   const signOut = () => {

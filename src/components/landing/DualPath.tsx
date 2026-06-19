@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn, FadeInLeft, FadeInRight } from "@/components/motion";
+import Link from "next/link";
 
 const humanFeatures = [
   "Pre-vetted setters & closers",
@@ -55,12 +56,12 @@ export default function DualPath() {
             </ul>
 
             <div className="mt-8">
-              <a
+              <Link
                 href="/sign-up"
                 className="inline-flex items-center justify-center bg-[#ffffff] text-[#0b0b0b] rounded-full h-[44px] px-6 text-[15px] font-medium hover:opacity-90 transition-opacity"
               >
                 Browse Talent →
-              </a>
+              </Link>
             </div>
           </div>
           </FadeInLeft>
@@ -89,12 +90,12 @@ export default function DualPath() {
             </ul>
 
             <div className="mt-8">
-              <a
+              <Link
                 href="/sign-up"
                 className="inline-flex items-center justify-center bg-transparent text-[#b9b9b9] rounded-full h-[44px] px-6 text-[15px] font-medium border border-[#353535] hover:text-white hover:border-[#b9b9b9] transition-colors"
               >
                 Deploy an Agent →
-              </a>
+              </Link>
             </div>
           </div>
           </FadeInRight>

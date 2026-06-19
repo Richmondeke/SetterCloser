@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeIn, StaggerContainer, StaggerItem, ScaleIn } from "@/components/motion";
+import Link from "next/link";
 
 const starterFeatures = [
   "Browse talent profiles",
@@ -61,12 +62,12 @@ export default function Pricing() {
                 For sales leaders exploring the marketplace
               </p>
 
-              <a
+              <Link
                 href="/sign-up"
                 className="mt-6 w-full inline-flex items-center justify-center bg-[#0b0b0b] text-[#ffffff] rounded-full h-[44px] px-6 text-[15px] font-medium hover:opacity-90 transition-opacity"
               >
                 Get Started
-              </a>
+              </Link>
 
               <ul className="mt-8 space-y-3">
                 {starterFeatures.map((feature) => (
@@ -95,12 +96,12 @@ export default function Pricing() {
                 For teams scaling their sales pipeline
               </p>
 
-              <a
+              <Link
                 href="/sign-up"
                 className="mt-6 w-full inline-flex items-center justify-center bg-[#f36458] text-[#0b0b0b] rounded-full h-[44px] px-6 text-[15px] font-medium hover:opacity-90 transition-opacity"
               >
                 Start Free Trial
-              </a>
+              </Link>
 
               <ul className="mt-8 space-y-3">
                 {proFeatures.map((feature) => (
@@ -126,12 +127,12 @@ export default function Pricing() {
                 For organizations with advanced needs
               </p>
 
-              <a
+              <Link
                 href="/sign-up"
                 className="mt-6 w-full inline-flex items-center justify-center bg-[#0b0b0b] text-[#ffffff] rounded-full h-[44px] px-6 text-[15px] font-medium hover:opacity-90 transition-opacity"
               >
                 Contact Sales
-              </a>
+              </Link>
 
               <ul className="mt-8 space-y-3">
                 {enterpriseFeatures.map((feature) => (
