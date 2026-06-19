@@ -12,6 +12,7 @@ const SETTER_NAV = [
     items: [
       { name: "Dashboard", href: "/talent/dashboard", icon: "◎" },
       { name: "Find Jobs", href: "/talent/jobs", icon: "◇" },
+      { name: "My Forms", href: "/talent/forms", icon: "▢" },
       { name: "My Earnings", href: "/talent/earnings", icon: "$" },
     ],
   },
@@ -31,6 +32,7 @@ const CLOSER_NAV = [
     items: [
       { name: "Dashboard", href: "/talent/dashboard", icon: "◎" },
       { name: "Find Jobs", href: "/talent/jobs", icon: "◇" },
+      { name: "My Forms", href: "/talent/forms", icon: "▢" },
       { name: "My Earnings", href: "/talent/earnings", icon: "$" },
     ],
   },
@@ -92,6 +94,7 @@ const ADMIN_NAV = [
     items: [
       { name: "Talent Dashboard", href: "/talent/dashboard", icon: "◎" },
       { name: "Job Board", href: "/talent/jobs", icon: "◇" },
+      { name: "Forms", href: "/talent/forms", icon: "▢" },
       { name: "Earnings", href: "/talent/earnings", icon: "$" },
       { name: "Talent Profile", href: "/talent/profile", icon: "○" },
     ],
