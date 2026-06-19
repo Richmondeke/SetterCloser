@@ -68,12 +68,20 @@ export default function AIAgentsPage() {
             AI Sales Agents
           </h1>
         </div>
-        <Link
-          href="/company/ai-agents/new"
-          className="bg-[#f36458] text-[#0b0b0b] rounded-full px-6 h-[44px] text-[14px] font-medium hover:opacity-90 transition inline-flex items-center gap-2"
-        >
-          + Deploy Agent
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/company/ai-agents/playground"
+            className="border border-[#353535] text-[#ffffff] rounded-full px-6 h-[44px] text-[14px] font-medium hover:border-[#797979] hover:bg-[#212121]/30 transition inline-flex items-center gap-2"
+          >
+            ⚙ Open Playground
+          </Link>
+          <Link
+            href="/company/ai-agents/new"
+            className="bg-[#f36458] text-[#0b0b0b] rounded-full px-6 h-[44px] text-[14px] font-medium hover:opacity-90 transition inline-flex items-center gap-2"
+          >
+            + Deploy Agent
+          </Link>
+        </div>
       </div>
 
       {agents.length > 0 ? (
