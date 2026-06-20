@@ -45,8 +45,8 @@ interface UserContextType {
   companyData: CompanyData;
 
   // Actions
-  signUp: (name: string, email: string, role: UserRole) => void;
-  signIn: (email: string, role?: UserRole) => void;
+  signUp: (name: string, email: string, role: UserRole) => Promise<void>;
+  signIn: (email: string, role?: UserRole) => Promise<void>;
   signOut: () => void;
   updateTalentData: (data: Partial<TalentData>) => void;
   updateCompanyData: (data: Partial<CompanyData>) => void;
@@ -226,12 +226,50 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const isAdmin = isAdminEmail(userEmail);
 
-  const signUp = (name: string, email: string, role: UserRole) => {
+  const syncProfileState = (data: any) => {
+    setOnboardingComplete(data.onboardingComplete);
+    if (data.user) {
+      setUserName(data.user.name);
+      setUserEmail(data.user.email);
+      setUserRole(data.user.role === "COMPANY" ? "company" : "talent");
+    }
+    if (data.talentProfile) {
+      setTalentData({
+        roleType: data.talentProfile.roleType === "SETTER" ? "Setter" : data.talentProfile.roleType === "CLOSER" ? "Closer" : data.talentProfile.roleType === "BOTH" ? "Both" : null,
+        industries: data.talentProfile.industries || [],
+        frameworks: data.talentProfile.salesFrameworks || [],
+        compensationPreference: data.talentProfile.compensationPreference === "COMMISSION_ONLY" ? "Commission Only" : data.talentProfile.compensationPreference === "BASE_PLUS_COMMISSION" ? "Base + Commission" : data.talentProfile.compensationPreference === "PER_MEETING" ? "Per Meeting" : "Salary",
+        yearsExperience: data.talentProfile.yearsExperience,
+        headline: data.talentProfile.headline || "",
+        bio: data.talentProfile.bio || "",
+        linkedinUrl: data.talentProfile.linkedinUrl || "",
+        portfolioUrl: data.talentProfile.portfolioUrl || "",
+        videoIntroUrl: data.talentProfile.videoIntroUrl || "",
+        timezone: data.talentProfile.timezone || "",
+        availability: data.talentProfile.isAvailable ? "Full-time" : "Unavailable",
+      });
+    }
+    if (data.companyProfile) {
+      setCompanyData({
+        companyName: data.companyProfile.companyName || "",
+        industry: data.companyProfile.industry || "",
+        website: data.companyProfile.website || "",
+        teamSize: data.companyProfile.teamSize ? `${data.companyProfile.teamSize} employees` : "",
+        location: data.companyProfile.location || "",
+        description: data.companyProfile.description || "",
+        lookingFor: data.companyProfile.icpDefinition?.lookingFor || [],
+        compensationModel: data.companyProfile.icpDefinition?.compensationModel || null,
+      });
+    }
+  };
+
+  const signUp = async (name: string, email: string, role: UserRole) => {
     setUserName(name);
     setUserEmail(email);
     setUserRole(role);
     setIsAuthenticated(true);
-    // Admin emails get admin mode automatically
+    setOnboardingComplete(false);
+
     if (isAdminEmail(email)) {
       setViewMode("admin");
     } else if (role === "company") {
@@ -239,9 +277,25 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } else {
       setViewMode("setter");
     }
+
+    if (!demoMode) {
+      try {
+        const res = await fetch("/api/auth/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, role }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          syncProfileState(data);
+        }
+      } catch (err) {
+        console.error("Error signing up live:", err);
+      }
+    }
   };
 
-  const signIn = (email: string, role?: UserRole) => {
+  const signIn = async (email: string, role?: UserRole) => {
     let resolvedRole: UserRole = role || null;
     if (!resolvedRole) {
       const persisted = loadState();
@@ -264,13 +318,29 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUserName(resolvedRole === "company" ? "ScaleUp.io" : "Jane Smith");
     setIsAuthenticated(true);
     setOnboardingComplete(true);
-    // Admin emails get admin mode automatically
+
     if (isAdminEmail(email)) {
       setViewMode("admin");
     } else if (resolvedRole === "company") {
       setViewMode("hiring");
     } else {
       setViewMode("setter");
+    }
+
+    if (!demoMode) {
+      try {
+        const res = await fetch("/api/auth/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, role: resolvedRole }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          syncProfileState(data);
+        }
+      } catch (err) {
+        console.error("Error signing in live:", err);
+      }
     }
   };
 
@@ -287,11 +357,31 @@ export function UserProvider({ children }: { children: ReactNode }) {
   };
 
   const updateTalentData = (data: Partial<TalentData>) => {
-    setTalentData(prev => ({ ...prev, ...data }));
+    setTalentData(prev => {
+      const next = { ...prev, ...data };
+      if (!demoMode && userEmail) {
+        fetch("/api/profile/talent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail, ...next }),
+        }).catch(err => console.error("Error saving talent data:", err));
+      }
+      return next;
+    });
   };
 
   const updateCompanyData = (data: Partial<CompanyData>) => {
-    setCompanyData(prev => ({ ...prev, ...data }));
+    setCompanyData(prev => {
+      const next = { ...prev, ...data };
+      if (!demoMode && userEmail) {
+        fetch("/api/profile/company", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail, ...next }),
+        }).catch(err => console.error("Error saving company data:", err));
+      }
+      return next;
+    });
   };
 
   const completeOnboarding = () => {

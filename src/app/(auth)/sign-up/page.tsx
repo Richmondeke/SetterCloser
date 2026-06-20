@@ -17,7 +17,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim().length < 2) {
       setError("Name must be at least 2 characters.");
@@ -36,7 +36,7 @@ export default function SignUpPage() {
       return;
     }
     setError("");
-    signUp(name, email, role);
+    await signUp(name, email, role);
     if (role === "talent") {
       router.push("/talent/onboarding");
     } else if (role === "company") {

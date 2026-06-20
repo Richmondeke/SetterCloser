@@ -13,7 +13,7 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes("@") || !email.includes(".")) {
       setError("Please enter a valid email address.");
@@ -49,7 +49,7 @@ export default function SignInPage() {
       }
     }
 
-    signIn(email);
+    await signIn(email);
 
     if (isAdmin || resolvedRole === "company") {
       router.push("/company/dashboard");
